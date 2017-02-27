@@ -1,0 +1,30 @@
+Package: INWTdbMonitor
+Title: Monitor for MariaDB or MySQL
+Version: 0.8.8.6
+Author: INWT Statistics GmbH
+Maintainer: INWT Statistics GmbH <martin.badicke@inwt-statistics.de>
+Description: Monitor for MariaDB Servers.
+Depends:
+    R (>= 3.3.2)
+Imports:
+	shiny,
+	shinydashboard,
+	humanFormat,
+	lubridate,
+	googleVis,
+	rhandsontable,
+	xts,
+	DT,
+	dygraphs,
+	dbtools,
+	tidyr,
+	RMySQL,
+	magrittr,
+	dplyr (>= 0.5.0)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Suggests: 
+	lintr,
+	testthat

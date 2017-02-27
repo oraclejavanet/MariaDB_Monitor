@@ -1,0 +1,35 @@
+/* Elemente in Sidebar einrücken */
+.sidebar .sidebar-menu>li>a {
+	padding: 0px 0px 0px 0px;
+}
+
+/* Hintergrund Boxes */						
+.bg-light-blue {
+	background-color: #607D8B !important
+}
+
+/* Farbe aktives Tab */
+.nav-tabs-custom > .nav-tabs > li.active {
+	border-top-color: #1A237E
+}
+
+/* Farbe success */
+.text-success {
+	color: #1B5E20
+}
+
+/* Farbe info */
+.text-info {
+	color: #01579B
+}
+
+/* Farbe danger */
+.text-danger {
+	color: #F44336
+}
+
+/* Dropdown Menü */
+.navbar-nav > .messages-menu > .dropdown-menu, .navbar-nav > .notifications-menu > .dropdown-menu, .navbar-nav > .tasks-menu > .dropdown-menu {
+	width: 330px
+}
+
