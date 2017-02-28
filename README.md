@@ -24,7 +24,10 @@ FLUSH PRIVILEGES;
 ```
 
 The username, password, database host and database port must
-be entered into the **cnf.file** file. Specifying a database is optional.
+be entered into the **cnf.file** file, located in `~/.INWTdbMonitor/cnf.file`. 
+Specifying a database is optional.
+Instead of manually entering the data a configuration wizard
+can be used by runnung the function `promptCnfData()`.
 
 ```
 [client]

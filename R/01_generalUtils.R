@@ -84,6 +84,46 @@ helperDygraphDat <- function(.dat) {
   return(tmp)
 }
 
+# function to create config file for database connection
+createCnf <- function() {
+
+  if (file.exists("~/.INWTdbMonitor")) {
+
+    if (!file.exists("~/.INWTdbMonitor/cnf.file")) {
+      file.copy(paste0(system.file("app", package = "INWTdbMonitor"), "/cnf.file"), "~/.INWTdbMonitor/cnf.file", overwrite = FALSE)
+    }
+
+  } else {
+    dir.create("~/.INWTdbMonitor")
+    file.copy(paste0(system.file("app", package = "INWTdbMonitor"), "/cnf.file"), "~/.INWTdbMonitor/cnf.file", overwrite = FALSE)
+  }
+
+  invisible()
+
+}
+
+createCnf()
+
+#' function to enter credentials to database server
+#'
+#' ...
+#'
+#' @export
+promptCnfData <- function() {
+
+    createCnf()
+
+    appConfig <- readLines("~/.INWTdbMonitor/cnf.file")
+
+    appConfig[2] <- paste0("user=", readline(prompt = "Enter the username for the database connection: "))
+    appConfig[3] <- paste0("password=", readline(prompt = "Enter the password for the database connection: "))
+    appConfig[5] <- paste0("host=", readline(prompt = "Enter the database host: "))
+    appConfig[6] <- paste0("port=", readline(prompt = "Enter the database port: "))
+
+    writeLines(appConfig, "~/.INWTdbMonitor/cnf.file")
+
+}
+
 # Grep matching Line in cnf.file
 grepLine <- function(file, what) {
   gsub(what, "", file[grep(what, file)])
@@ -95,7 +135,7 @@ grepLine <- function(file, what) {
 #'
 #' @export
 initDbServer <- function() {
-  sqlCredFile <- readLines(system.file("app", package = "INWTdbMonitor") %p0% "/cnf.file")
+  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
   grepLine(sqlCredFile, "host=") %p0% ":" %p0% grepLine(sqlCredFile, "port=")
 
 }
@@ -103,7 +143,11 @@ initDbServer <- function() {
 # reactive function for database credentials
 mutateDbConfig <- function() {
 
-  sqlCredFile <- readLines(system.file("app", package = "INWTdbMonitor") %p0% "/cnf.file")
+  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
+
+  init <- function() {
+    sqlCredFile <<- readLines("~/.INWTdbMonitor/cnf.file")
+  }
 
   get <- function() {
     sqlCredFile
@@ -116,7 +160,7 @@ mutateDbConfig <- function() {
   }
 
 
-  list(set = set, get = get)
+  list(set = set, get = get, init = init)
 
 }
 
@@ -126,6 +170,7 @@ mutateDbConfig <- function() {
 #'
 #' @export
 dbConfig <- mutateDbConfig()
+
 
 #' generate SQL-Cedentials
 #'
