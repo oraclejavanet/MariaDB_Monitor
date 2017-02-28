@@ -1,6 +1,6 @@
 context("configVal")
 
-test_that("threshSlowQryOrange", {
+test_that("threshhold is numeric", {
 
   configVar <- "threshSlowQryOrange"
 

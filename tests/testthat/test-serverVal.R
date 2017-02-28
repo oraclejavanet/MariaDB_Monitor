@@ -1,7 +1,7 @@
 context("serverVal")
 
 
-test_that("serverVal", {
+test_that("extract server values worked", {
 
   dat <- data.frame(
     VARIABLE_NAME = c("var1", "var2"),

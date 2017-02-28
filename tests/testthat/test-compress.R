@@ -1,6 +1,6 @@
 context("compress")
 
-test_that("compress", {
+test_that("compress worked", {
 
   dat <- compress(1024)
 

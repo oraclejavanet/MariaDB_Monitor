@@ -1,6 +1,6 @@
 context("helperBufferWrite")
 
-test_that("helperBufferWrite", {
+test_that("calc difference worked", {
 
   datOld <- data.frame(
     VARIABLE_NAME = c("INNODB_LOG_WRITE_REQUESTS", "LOG_WRITES", "LOG_WRITES_OS_MB"),
