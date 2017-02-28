@@ -180,22 +180,16 @@ queryDB <- function(query, host = dbConfig$get(), port = dbConfig$get()) {
 
   qry <- query
 
-  dbSendQuery <- function(...) {
-    suppressWarnings(RMySQL::dbSendQuery(...))
-  }
-
-  con <- dbConnect(MySQL(),
-                   username = grepLine(dbConfig$get(), "user="),
-                   password = grepLine(dbConfig$get(), "password="),
-                   dbname = grepLine(dbConfig$get(), "database="),
-                   host = grepLine(host, "host="),
-                   port = as.numeric(grepLine(port, "port="))
+  genSQLCred <- Credentials (
+    drv = MySQL,
+    username = grepLine(dbConfig$get(), "user="),
+    password = grepLine(dbConfig$get(), "password="),
+    dbname = grepLine(dbConfig$get(), "database="),
+    host = grepLine(host, "host="),
+    port = as.numeric(grepLine(port, "port="))
   )
 
-  tmp <- dbSendQuery(con, qry)
-  dat <- dbFetch(tmp, n = -1)
-  dbClearResult(tmp)
-  dbDisconnect(con)
+  dat <- sendQuery(genSQLCred, qry, encoding = NULL)
 
   return(dat)
 }
