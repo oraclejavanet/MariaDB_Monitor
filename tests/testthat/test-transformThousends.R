@@ -7,7 +7,7 @@ test_that("transform thousends worked", {
     VARIABLE_NAME = c("var1", "var2"),
     VARIABLE_VALUE = c(1500, 20000))
 
-  varsTransformThousend <- "var1"
+  varsTransformThousend <<- "var1"
 
   dat <- transformThousends(dat)
 

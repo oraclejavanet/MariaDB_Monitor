@@ -4,12 +4,18 @@ appConfig <- read.csv2(paste0(system.file("app", package = "INWTdbMonitor"), "/a
 
 ## general app-functions ---------------------------------
 
-#' paste functions
+#' paste function space
 #'
 #' ...
 #'
 #' @export
 `%p%`        <- function(x, y) paste(x, y)
+
+#' paste function not space
+#'
+#' ...
+#'
+#' @export
 `%p0%`       <- function(x, y) paste0(x, y)
 
 ## general functions ---------------------------------
