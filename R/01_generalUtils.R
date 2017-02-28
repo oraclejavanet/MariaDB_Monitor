@@ -1,3 +1,7 @@
+## load app configuration (schedules, thresholds)
+appConfig <- read.csv2(paste0(system.file("app", package = "INWTdbMonitor"), "/app.cnf"),
+                       stringsAsFactors = FALSE, header = TRUE) %>% mutate(value = as.numeric(value))
+
 ## general app-functions ---------------------------------
 
 #' paste functions
@@ -7,14 +11,6 @@
 #' @export
 `%p%`        <- function(x, y) paste(x, y)
 `%p0%`       <- function(x, y) paste0(x, y)
-
-#' load app configuration (schedules, thresholds)
-#'
-#' ...
-#'
-#' @export
-appConfig <- read.csv2(system.file("app", package = "INWTdbMonitor") %p0%
-                         "/app.cnf", stringsAsFactors = FALSE, header = TRUE) %>% mutate(value = as.numeric(value))
 
 ## general functions ---------------------------------
 
@@ -58,29 +54,6 @@ compress <- function(x, round.by = 2) {
   # by StackOverflow user 'BondedDust' : http://stackoverflow.com/a/28160474
   div <- findInterval(as.numeric(gsub("\\, ", "", x)), c(1, 1e3, 1e6, 1e9, 1e12) )
   paste(round( as.numeric(gsub("\\, ", "", x)) / 10 ^ (3 * (div - 1)), round.by), c("", "K", "M", "B", "T")[div], sep = "" )
-}
-
-# Conditional icon for widget.
-# Returns arrow-up icon on true (if true_direction is 'up'), e.g. load time % change > 0
-cond_icon <- function(condition, true_direction = "up") {
-
-  if (true_direction == "up") {
-    return(icon(ifelse(condition, "arrow-up", "arrow-down")))
-  }
-
-  return(icon(ifelse(condition, "arrow-down", "arrow-up")))
-}
-
-# Conditional color for widget
-# Returns 'green' on true, 'red' on false, e.g. api usage % change > 0
-#                                               load time % change < 0
-cond_color <- function(condition, true_color = "green") {
-  if (is.na(condition)){
-    return("black")
-  }
-
-  colours <- c("green", "red")
-  return(ifelse(condition, true_color, colours[!colours == true_color]))
 }
 
 #' Calculate Differences in Timeline-Data
