@@ -56,9 +56,9 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}}
-
   \item{dplyr}{\code{\link[dplyr]{filter}}, \code{\link[dplyr]{mutate}}}
+
+  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}}
 
   \item{dygraphs}{\code{\link[dygraphs]{dygraphOutput}}, \code{\link[dygraphs]{renderDygraph}}, \code{\link[dygraphs]{dygraph}}, \code{\link[dygraphs]{dyAxis}}, \code{\link[dygraphs]{dySeries}}, \code{\link[dygraphs]{dyOptions}}, \code{\link[dygraphs]{dyLegend}}, \code{\link[dygraphs]{dyRangeSelector}}, \code{\link[dygraphs]{dyHighlight}}}
 
