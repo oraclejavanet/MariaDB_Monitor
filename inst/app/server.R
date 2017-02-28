@@ -1,8 +1,8 @@
-# load configuration file
-
 library("INWTdbMonitor")
 
+# load init config
 source(paste0(system.file("app", package = "INWTdbMonitor"), "/cnf.R"))
+dbConfig$init()
 
 shinyServer(function(input, output, session) {
 
