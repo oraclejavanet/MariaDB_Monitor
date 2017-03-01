@@ -2,7 +2,7 @@
 
 export("%>%")
 export("%p%")
-export(appConfig)
+export("%p0%")
 export(appDataTable)
 export(appPieChart)
 export(asNum)
