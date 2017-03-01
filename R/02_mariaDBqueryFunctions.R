@@ -649,6 +649,6 @@ qryMaxInfo <- function(what) {
 
   if (is.null(qryMaxscale())) return(NULL)
 
-  queryDB("show " %p0% what, "host=" %p0% qryMaxscale()$HOST, "port=" %p0% qryMaxscale()$PORT)
+  queryDB("show " %p0% what %p0% ";", "host=" %p0% qryMaxscale()$HOST, "port=" %p0% qryMaxscale()$PORT)
 
 }
