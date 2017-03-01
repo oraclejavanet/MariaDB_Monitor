@@ -10,7 +10,7 @@ test_that("initDbServer", {
   checkFile()
   dat <- initDbServer()
   expect_is(dat, "character")
-  expect_true(grep(":",dat)==1)
+  expect_true(grep(":", dat) == 1)
 })
 
 test_that("mutateDbConfig", {
