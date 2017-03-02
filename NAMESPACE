@@ -3,6 +3,7 @@
 export("%>%")
 export("%p%")
 export("%p0%")
+export(appConfig)
 export(appDataTable)
 export(appPieChart)
 export(asNum)

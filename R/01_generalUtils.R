@@ -1,4 +1,8 @@
-## load app configuration (schedules, thresholds)
+#' load app configuration (schedules, thresholds)
+#'
+#' ...
+#'
+#' @export
 appConfig <- read.csv2(paste0(system.file("app", package = "INWTdbMonitor"), "/app.cnf"),
                        stringsAsFactors = FALSE, header = TRUE) %>% mutate(value = as.numeric(value))
 
