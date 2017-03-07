@@ -36,6 +36,8 @@ globalMemVars <- c("key_buffer_size", "query_cache_size", "innodb_buffer_pool_si
                   "innodb_additional_mem_pool_size", "innodb_log_buffer_size")
 perConnectionMemVars <- c("read_buffer_size", "read_rnd_buffer_size", "sort_buffer_size",
                   "join_buffer_size", "binlog_cache_size", "thread_stack", "tmp_table_size")
+# aborted cons
+abortedCons <- c("aborted_clients", "aborted_connects")
 
 
 ## Vars for transformation for thousend (10000 -> 10 000)  ---------------------------------

@@ -205,6 +205,11 @@ shinyServer(function(input, output, session) {
     )
   })
 
+  output$tblAbortCon <- DT::renderDataTable({
+    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% abortedCons))
+    )
+  })
+
   # DT:renderDataTables
   output$tblUsedCon <- DT::renderDataTable({
     datatable(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% usedConVars), options = list(pageLength = 50, searching = FALSE,
