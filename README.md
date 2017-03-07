@@ -10,7 +10,7 @@ devtools::install_github("INWT/MariaDB_Monitor")
 ```
 
 ## Configuration
-To run the app, the configuration file **cnf.file** has to be adjusted. The database user of the app 
+To run the app, the **cnf.file** configuration file should be customized. The database user of the app 
 must have sufficient privileges to retrieve performance data (e.g., performance_schema). The following 
 create-script is a possibility, but should be adapted from the point of view of security:
 
