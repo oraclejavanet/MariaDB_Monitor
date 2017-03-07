@@ -652,3 +652,28 @@ qryMaxInfo <- function(what) {
   queryDB("show " %p0% what, "host=" %p0% qryMaxscale()$HOST, "port=" %p0% qryMaxscale()$PORT)
 
 }
+
+#' Query host cache
+#'
+#' Function to query host cache
+#'
+#' @export
+qryHostCache <- function() {
+
+  qryHostCacheData <- queryDB("
+    Select
+      SUM_CONNECT_ERRORS,
+      COUNT_HANDSHAKE_ERRORS,
+      COUNT_AUTHENTICATION_ERRORS,
+      COUNT_SSL_ERRORS,
+      COUNT_MAX_USER_CONNECTIONS_ERRORS,
+      FIRST_SEEN,
+      LAST_SEEN,
+      FIRST_ERROR_SEEN,
+      LAST_ERROR_SEEN
+	FROM performance_schema.host_cache
+  where FIRST_ERROR_SEEN is not NULL;")
+
+  return(qryHostCacheData)
+
+}
