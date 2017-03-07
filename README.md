@@ -43,3 +43,7 @@ In addition, it is necessary that the following entry is set under `[mysqld]` in
 ```
 performance_schema = on
 ```
+
+## Further Information's
+Further information’s and explanations can be found in our blog article
+-	MariaDB-Monitor ([English-Version](https://www.inwt-statistics.com/read-blog/mariadb-monitor.html)/ [Deutsche-Version](https://www.inwt-statistics.de/blog-artikel-lesen/mariadb_monitor.html))
