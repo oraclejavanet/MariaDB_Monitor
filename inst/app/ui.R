@@ -125,6 +125,10 @@ body <- dashboardBody(
                   box(title = "Joins", DT::dataTableOutput("tblJoins"), width = 4),
                   box(title = "Table Scans", DT::dataTableOutput("tblTblScan"), width = 4),
                   box(title = "Binlog Cache", DT::dataTableOutput("tblBinlogCache"), width = 4)
+                ),
+
+                fluidRow(
+                  box(title = "Aborted Connections", DT::dataTableOutput("tblAbortCon"), width = 4)
                 )
             )
     ), # /tabItem
