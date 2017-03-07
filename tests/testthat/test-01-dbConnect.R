@@ -2,16 +2,16 @@ context("dbConnect")
 
 noDBcon <- function() {
 
-  file.exists("~/.INWTdbMonitor/cnf.file") |
+  !file.exists("~/.INWTdbMonitor/cnf.file") |
     if (file.exists("~/.INWTdbMonitor/cnf.file")) {
 
       tmp <- readLines("~/.INWTdbMonitor/cnf.file")
 
-      nchar(grepLine(tmp, "user=")) == 0 &
-        nchar(grepLine(tmp, "password=")) == 0 &
-        nchar(grepLine(tmp, "host=")) == 0 &
-        nchar(grepLine(tmp, "port=")) == 0
-    } else {TRUE}
+      !(nchar(grepLine(tmp, "user=")) > 0 &
+      nchar(grepLine(tmp, "password=")) > 0 &
+      nchar(grepLine(tmp, "host=")) > 0 &
+      nchar(grepLine(tmp, "port=")) > 0)
+    } else {FALSE}
 
 }
 
