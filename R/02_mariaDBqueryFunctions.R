@@ -662,16 +662,19 @@ qryHostCache <- function() {
 
   qryHostCacheData <- queryDB("
     Select
-      SUM_CONNECT_ERRORS,
-      COUNT_HANDSHAKE_ERRORS,
-      COUNT_AUTHENTICATION_ERRORS,
-      COUNT_SSL_ERRORS,
-      COUNT_MAX_USER_CONNECTIONS_ERRORS,
-      FIRST_SEEN,
-      LAST_SEEN,
-      FIRST_ERROR_SEEN,
-      LAST_ERROR_SEEN
-	FROM performance_schema.host_cache
+      IP as ip,
+      HOST as host,
+      SUM_CONNECT_ERRORS AS con_err,
+      COUNT_HANDSHAKE_ERRORS AS handshake_err,
+      COUNT_AUTHENTICATION_ERRORS AS auth_err,
+      COUNT_SSL_ERRORS AS ssl_err,
+      COUNT_MAX_USER_CONNECTIONS_ERRORS AS max_user_con_err,
+      COUNT_FCRDNS_ERRORS AS fcrdns_err,
+      FIRST_SEEN AS first_seen,
+      LAST_SEEN AS last_seen,
+      FIRST_ERROR_SEEN AS first_err_seen,
+      LAST_ERROR_SEEN AS last_err_seen
+    FROM performance_schema.host_cache
   where FIRST_ERROR_SEEN is not NULL;")
 
   return(qryHostCacheData)

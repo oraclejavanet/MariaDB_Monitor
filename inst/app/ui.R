@@ -162,7 +162,17 @@ body <- dashboardBody(
             p(includeMarkdown("./assets/user.md")),
 
             fluidRow(
-              box(title = "User Statistcs", DT::dataTableOutput("tableUserStat"), width = 12)
+              tabBox(
+
+                id = "panelUsers",
+                title = tagList(shiny::icon("table"), "User and Host Statistic"), width = 12,
+                tabPanel("User Statistc",
+                         DT::dataTableOutput("tableUserStat")
+                ),
+                tabPanel("Host Statistic",
+                         DT::dataTableOutput("tblHostCache")
+                )
+              )
             )
     ),
 

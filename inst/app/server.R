@@ -72,6 +72,11 @@ shinyServer(function(input, output, session) {
     reloadBySchedule(dat = qryProcData(), schedule = "each5Seconds")
     })
 
+  hostCache <- reactive({
+    input$serverList
+    reloadBySchedule(dat = qryHostCache(), schedule = "daily")
+  })
+
   # Select DB-Servers in Master-Slave-Replication ---------------------------------
   output$serverList <- renderUI({
     selectInput(inputId = "serverList", label = h4("Select server:"),
@@ -370,6 +375,16 @@ shinyServer(function(input, output, session) {
       formatStyle(
         'no_index_used_pct',
         color = styleInterval(c(50, 99), c('black', 'orange', 'red'))
+      )
+  }
+  )
+
+  output$tblHostCache <- DT::renderDataTable({
+    datatable(hostCache(), options = list(pageLength = 50)) %>%
+      formatStyle(
+        c('con_err', 'handshake_err', 'auth_err', 'ssl_err',
+          'max_user_con_err', 'fcrdns_err'),
+        color = styleInterval(c(0, 1), c('black', 'orange', 'red'))
       )
   }
   )
