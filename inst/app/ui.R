@@ -105,8 +105,9 @@ body <- dashboardBody(
             conditionalPanel("input.moreInfo == 1",
 
                 fluidRow(
-                  box(title = "Temp Tables", DT::dataTableOutput("tblTmpTables"), width = 6),
-                  box(title = "Table Locking", DT::dataTableOutput("tblTblLock"), width = 6)
+                  box(title = "Temp Tables", DT::dataTableOutput("tblTmpTables"), width = 4),
+                  box(title = "Table Locking", DT::dataTableOutput("tblTblLock"), width = 4),
+                  box(title = "Aborted Connections", DT::dataTableOutput("tblAbortCon"), width = 4)
                 ),
 
                 fluidRow(
@@ -125,10 +126,6 @@ body <- dashboardBody(
                   box(title = "Joins", DT::dataTableOutput("tblJoins"), width = 4),
                   box(title = "Table Scans", DT::dataTableOutput("tblTblScan"), width = 4),
                   box(title = "Sort Operations", DT::dataTableOutput("tblSortOp"), width = 4)
-                ),
-
-                fluidRow(
-                  box(title = "Aborted Connections", DT::dataTableOutput("tblAbortCon"), width = 4)
                 )
             )
     ), # /tabItem
