@@ -9,4 +9,3 @@ bufferTotDat(dat)
 \description{
 ...
 }
-

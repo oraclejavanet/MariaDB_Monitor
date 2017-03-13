@@ -9,4 +9,3 @@ appPieChart(label, value, badColor = "#FF9800", goodColor = "#4CAF50")
 \description{
 ...
 }
-

@@ -9,4 +9,3 @@ qryFullTblScanStmt()
 \description{
 Function to query statements with full table scan. The number of results is limited to 50.
 }
-

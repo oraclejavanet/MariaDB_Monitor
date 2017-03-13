@@ -9,4 +9,3 @@ qryBufferReads()
 \description{
 Function to query statistics of buffer reads of mariadb.
 }
-

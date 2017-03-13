@@ -9,4 +9,3 @@ qryLogWrites()
 \description{
 Function to query statistics of log writes of mariadb.
 }
-

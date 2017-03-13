@@ -9,4 +9,3 @@ queryDB(query, host = dbConfig$get(), port = dbConfig$get())
 \description{
 ...
 }
-

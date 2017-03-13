@@ -12,4 +12,3 @@ dbConfig
 ...
 }
 \keyword{datasets}
-

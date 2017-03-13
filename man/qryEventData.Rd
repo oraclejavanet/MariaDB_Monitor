@@ -9,4 +9,3 @@ qryEventData()
 \description{
 Function to query statistics for the events of the event scheduler.
 }
-

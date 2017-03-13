@@ -9,4 +9,3 @@ qryTmpDiscTblStmt()
 \description{
 Function to query statements with temporary tables.
 }
-

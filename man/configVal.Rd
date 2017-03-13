@@ -9,4 +9,3 @@ configVal(x)
 \description{
 ...
 }
-

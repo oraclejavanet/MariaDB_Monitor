@@ -10,4 +10,3 @@ qryUserStat()
 Function to query statistics of the mariadb users. The number of results can be configured through
 a limit in the configuration file - cnf.file - (qryUserStatLimit).
 }
-

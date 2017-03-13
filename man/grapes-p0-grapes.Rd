@@ -9,4 +9,3 @@ x \%p0\% y
 \description{
 ...
 }
-

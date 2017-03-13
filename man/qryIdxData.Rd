@@ -9,4 +9,3 @@ qryIdxData()
 \description{
 Function to query statistics for unused table indices since last restart.
 }
-

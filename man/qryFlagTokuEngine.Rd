@@ -9,4 +9,3 @@ qryFlagTokuEngine()
 \description{
 Function to check if TokuDB-Storage-Engine is in use
 }
-

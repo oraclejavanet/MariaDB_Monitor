@@ -9,4 +9,3 @@ qryMaxInfo(what)
 \description{
 Function to query maxinfo
 }
-

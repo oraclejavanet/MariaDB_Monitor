@@ -9,4 +9,3 @@ helperBufferWrite(datOld, datNew)
 \description{
 ...
 }
-

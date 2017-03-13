@@ -9,4 +9,3 @@ appDataTable(x)
 \description{
 ...
 }
-
