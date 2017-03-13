@@ -80,7 +80,7 @@ shinyServer(function(input, output, session) {
   # Select DB-Servers in Master-Slave-Replication ---------------------------------
   output$serverList <- renderUI({
     selectInput(inputId = "serverList", label = h4("Select server:"),
-                choices =  Filter(Negate(is.null), list(initDbServer(), qrySlaveServers()$HOST))
+                choices =  Filter(Negate(is.null), list(initDbServer(), qryProcData()$slaveServer$HOST))
     )
   })
 
@@ -121,7 +121,7 @@ shinyServer(function(input, output, session) {
 
   newEntry <- observe({
     invalidateLater(30000, session)
-    numUserDat <- qryTimeLine()
+    numUserDat <- qryProcData()$timeline
     isolate(values$numUsers <- rbind(values$numUsers, numUserDat))
 
     logWriteDat <- qryLogWrites()
@@ -152,11 +152,11 @@ shinyServer(function(input, output, session) {
   })
 
   output$tblProcessActive <- renderTable({
-    dplyr::filter(mySQLprocessList(),  COMMAND != "Sleep")
+    dplyr::filter(mySQLprocessList()$proclist,  COMMAND != "Sleep")
   })
 
   output$tblProcessSleep <- renderTable({
-    dplyr::filter(mySQLprocessList(),  COMMAND == "Sleep")
+    dplyr::filter(mySQLprocessList()$proclist,  COMMAND == "Sleep")
   })
 
   # DT:renderDataTables
