@@ -259,3 +259,68 @@ linkToTab <- function(link, msg){
 asNum <- function(x) {
   tryCatch(suppressWarnings(as.numeric(x)), error = function(e) NA)
 }
+
+# mutate process data
+procToTimeLine <- function(timeData) {
+
+  # datahandling for calculating tot_connections, tot_memory and run_connections
+  timeData <- timeData %>%
+    group_by(COMMAND) %>%
+    summarise(CONNECTIONS = n(),
+              TIME = sum(TIME),
+              MEMORY_USED = sum(MEMORY_USED),
+              DATETIME = max(DATETIME)) %>%
+    data.frame
+
+  timeData <- timeData %>%
+    mutate(MEMORY_USED = MEMORY_USED / 1024 / 1024) %>%
+    rbind(.,
+          c(COMMAND = "Total",
+            unlist(c(timeData %>%
+                       group_by(DATETIME)  %>%
+                       summarise(CONNECTIONS = sum(CONNECTIONS), TIME = sum(TIME), MEMORY_USED = sum(MEMORY_USED / 1024 / 1024)) %>%
+                       select(CONNECTIONS, TIME, MEMORY_USED, DATETIME)
+            )
+            )
+          )
+    ) %>%
+    filter(COMMAND %in% c('Total', 'Query')) %>%
+    summarise(DATETIME = max(DATETIME),
+              TOT_CONNECTIONS = max(CONNECTIONS),
+              TOT_MEMORY = max(MEMORY_USED),
+              RUN_CONNECTIONS = min(CONNECTIONS)) %>%
+    data.frame
+
+  timeData$DATETIME <- strptime(timeData$DATETIME, format = "%H:%M:%S")
+  timeData <- xts(timeData[, -1], order.by = timeData[, 1], tzone = appDbTz)
+
+  return(timeData)
+
+}
+
+# does slave server exist
+procSlaveServer <- function(procList) {
+
+  if (length(grep("Binlog Dump", procList$COMMAND)) == 0) return(NULL)
+
+  procList %>%
+    filter(grepl("Binlog Dump", COMMAND)) %>%
+    mutate(HOST = strsplit(HOST, ":")[[1]][1] %p0% ":3306")
+
+}
+
+# does maxscale exist
+procMaxscale <- function(procList) {
+
+  if (length(grep("maxscale", procList$USER)) == 0) return(NULL)
+
+  procList %>%
+    filter(grepl("maxscale", USER)) %>%
+    mutate(HOST = strsplit(HOST, ":")[[1]][1],
+           PORT = 9003)
+
+}
+
+
+
+

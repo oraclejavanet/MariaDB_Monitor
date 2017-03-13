@@ -137,15 +137,26 @@ qryServStatData <- function() {
 qryProcData <- function() {
 
   mySQLprocessList <- queryDB("SELECT `ID`, `USER`, `HOST`, `DB`, `COMMAND`, `TIME`, `PROGRESS`, `STATE`, `MEMORY_USED`,
-                              `EXAMINED_ROWS`, substr(`INFO`, 1, 120) as INFO FROM `information_schema`.`PROCESSLIST`;")
+                              `EXAMINED_ROWS`, substr(`INFO`, 1, 120) as INFO, CURRENT_TIME() as DATETIME
+                              FROM `information_schema`.`PROCESSLIST`;")
 
-  ## Human Readable Transformation
-  mySQLprocessList <- mySQLprocessList %>%
+  # timleline-view
+  timeline <- procToTimeLine(mySQLprocessList)
+
+  # proclist
+  proclist <- mySQLprocessList %>%
     mutate(MEMORY_USED = formatIECBytes(MEMORY_USED),
            TIME = as.character(seconds_to_period(TIME)),
-           ID = as.character(ID))
+           ID = as.character(ID)) %>%
+    select(-DATETIME)
 
-  return(mySQLprocessList)
+  # slave check
+  slaveServer <- procSlaveServer(mySQLprocessList)
+
+  # maxscale check
+  maxscale <- procMaxscale(mySQLprocessList)
+
+  list(timeline = timeline, proclist = proclist, slaveServer = slaveServer, maxscale = maxscale)
 
 }
 
@@ -419,45 +430,6 @@ qryIdxData <- function() {
 
 }
 
-#' Aggregated processlist
-#'
-#' Function to query semi-aggregated process data of mariadb. Output of the function is an xts object.
-#'
-#' @export
-qryTimeLine <- function() {
-
-  timeData <- queryDB("SELECT COMMAND, count( * ) as CONNECTIONS, sum(TIME) as TIME, sum(MEMORY_USED) as MEMORY_USED,
-                      CURRENT_TIME() as DATETIME
-                      FROM `information_schema`.`PROCESSLIST`
-                      group by COMMAND;")
-
-  # datahandling for calculating tot_connections, tot_memory and run_connections
-  timeData <- timeData %>%
-    mutate(MEMORY_USED = MEMORY_USED / 1024 / 1024) %>%
-    rbind(.,
-          c(COMMAND = "Total",
-            unlist(c(timeData %>%
-                       group_by(DATETIME)  %>%
-                       summarise(CONNECTIONS = sum(CONNECTIONS), TIME = sum(TIME), MEMORY_USED = sum(MEMORY_USED / 1024 / 1024)) %>%
-                       select(CONNECTIONS, TIME, MEMORY_USED, DATETIME)
-                     )
-                   )
-            )
-    ) %>%
-    filter(COMMAND %in% c('Total', 'Query')) %>%
-    summarise(DATETIME = max(DATETIME),
-              TOT_CONNECTIONS = max(CONNECTIONS),
-              TOT_MEMORY = max(MEMORY_USED),
-              RUN_CONNECTIONS = min(CONNECTIONS)) %>%
-    data.frame
-
-  timeData$DATETIME <- strptime(timeData$DATETIME, format = "%H:%M:%S")
-  timeData <- xts(timeData[, -1], order.by = timeData[, 1], tzone = appDbTz)
-
-  return(timeData)
-
-}
-
 #' Log writes
 #'
 #' Function to query statistics of log writes of mariadb.
@@ -593,22 +565,6 @@ qryErrWarnData <- function() {
 
 }
 
-#' Query Slave Servers
-#'
-#' Function to query the host and port of the slave servers (if exist)
-#'
-#' @export
-qrySlaveServers <- function() {
-
-  slaveServerData <- queryDB("SELECT * FROM information_schema.PROCESSLIST WHERE COMMAND = 'Binlog Dump';")
-
-  if (nrow(slaveServerData) == 0) return(NULL)
-
-  slaveServerData %>%
-    mutate(HOST = strsplit(HOST, ":")[[1]][1] %p0% ":3306")
-
-}
-
 #' Check if TokuDB-Storage-Engine is in use
 #'
 #' Function to check if TokuDB-Storage-Engine is in use
@@ -625,31 +581,14 @@ qryFlagTokuEngine <- function() {
 
 #' Query maxscale user
 #'
-#' Function to query the host of maxscale user (if exist)
-#'
-#' @export
-qryMaxscale <- function() {
-
-  maxScaleData <- queryDB("SELECT * FROM information_schema.PROCESSLIST WHERE USER = 'maxscale';")
-
-  if (nrow(maxScaleData) == 0) return(NULL)
-
-  maxScaleData %>%
-    mutate(HOST = strsplit(HOST, ":")[[1]][1],
-           PORT = 9003)
-
-}
-
-#' Query maxscale user
-#'
 #' Function to query maxinfo
 #'
 #' @export
 qryMaxInfo <- function(what) {
 
-  if (is.null(qryMaxscale())) return(NULL)
+  if (is.null(qryProcData()$maxscale)) return(NULL)
 
-  queryDB("show " %p0% what, "host=" %p0% qryMaxscale()$HOST, "port=" %p0% qryMaxscale()$PORT)
+  queryDB("show " %p0% what, "host=" %p0% qryProcData()$maxscale$HOST, "port=" %p0% qryProcData()$maxscale$PORT)
 
 }
 

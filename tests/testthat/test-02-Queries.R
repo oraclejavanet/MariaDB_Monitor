@@ -26,7 +26,7 @@ test_that("qryIdxData", {
 test_that("qryTimeLine", {
   checkConnection()
   appDbTz <<- "GMT"
-  dat <- qryTimeLine()
+  dat <- qryProcData()$timeline
   colNames <- c("TOT_CONNECTIONS", "TOT_MEMORY", "RUN_CONNECTIONS")
   expect_equal(names(dat), colNames)
   expect_is(dat, "xts")
@@ -140,7 +140,7 @@ test_that("qryTmpDiscTblStmt", {
 
 test_that("qryProcData", {
   checkConnection()
-  dat <- qryProcData()
+  dat <- qryProcData()$proclist
   colNames <- c("ID", "USER", "HOST", "DB", "COMMAND",
                 "TIME", "PROGRESS", "STATE", "MEMORY_USED",
                 "EXAMINED_ROWS", "INFO")
