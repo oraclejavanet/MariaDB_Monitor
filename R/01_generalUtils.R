@@ -362,7 +362,7 @@ bufferReads <- function(serverVars) {
 
 }
 
-#' clean server variables
+#' clean list of server variables
 #'
 #' ...
 #'
@@ -374,4 +374,32 @@ cleanVarList <- function(varList) {
 
 }
 
+#' clean global vars for log write statistic
+#'
+#' ...
+#'
+#' @export
+cleanLogWrites <- function(varList) {
+
+  filter <- switch(qryFlagTokuEngine(),
+                   c("innodb_os_log_written", "innodb_log_write_requests", "innodb_log_writes"),
+                   c("tokudb_logger_writes_bytes", "tokudb_logger_writes", "innodb_os_log_written",
+                     "innodb_log_write_requests", "innodb_log_writes"))
+
+
+  varList %>%
+    filter(VARIABLE_NAME %in% filter) %>%
+    mutate(VARIABLE_VALUE = ifelse(VARIABLE_NAME %in% c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"),
+                                   as.numeric(VARIABLE_VALUE) / 1024 / 1024,
+                                   VARIABLE_VALUE),
+           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"), "LOG_WRITES_OS_MB",
+                                  VARIABLE_NAME),
+           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_LOG_WRITES", "TOKUDB_LOGGER_WRITES"), "LOG_WRITES", VARIABLE_NAME)) %>%
+    group_by(VARIABLE_NAME) %>%
+    summarise(VARIABLE_VALUE = sum(as.numeric(VARIABLE_VALUE)),
+              DATETIME = first(DATETIME),
+              VARIABLE_VALUE_SEC = NA) %>%
+    data.frame
+
+}
 

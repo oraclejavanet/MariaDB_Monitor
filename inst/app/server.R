@@ -124,7 +124,7 @@ shinyServer(function(input, output, session) {
     numUserDat <- procToTimeLine(mySQLprocessList())
     isolate(values$numUsers <- rbind(values$numUsers, numUserDat))
 
-    logWriteDat <- qryLogWrites()
+    logWriteDat <- cleanLogWrites(innoDBstat())
     isolate(values$logWrite <- helperBufferWrite(values$logWrite, logWriteDat))
 
     bufferReadsDat <- bufferReads(innoDBstat())

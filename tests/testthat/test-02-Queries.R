@@ -35,7 +35,7 @@ test_that("qryTimeLine", {
 
 test_that("qryLogWrites", {
   checkConnection()
-  dat <- qryLogWrites()
+  dat <- cleanLogWrites(qryServStatData())
   colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE", "DATETIME", "VARIABLE_VALUE_SEC")
   expect_equal(names(dat), colNames)
   expect_is(dat, "data.frame")
