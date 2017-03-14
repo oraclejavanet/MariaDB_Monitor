@@ -9,4 +9,3 @@ qryServStatData()
 \description{
 Function to query mariadb global (status) variables.
 }
-

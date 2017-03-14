@@ -9,4 +9,3 @@ helperDygraphDat(.dat)
 \description{
 ...
 }
-

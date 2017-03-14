@@ -9,4 +9,3 @@ startApplication()
 \description{
 ...
 }
-

@@ -9,4 +9,3 @@ qryInnoDBStatus()
 \description{
 Function to query operational information about the innodb storage engine.
 }
-

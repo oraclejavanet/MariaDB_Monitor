@@ -9,4 +9,3 @@ qryIdxCardinality()
 \description{
 Function to query the cardinality of table indices.
 }
-

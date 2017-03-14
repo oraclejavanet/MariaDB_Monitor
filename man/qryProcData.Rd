@@ -9,4 +9,3 @@ qryProcData()
 \description{
 Function to query the processlist of mariadb.
 }
-

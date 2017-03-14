@@ -10,4 +10,3 @@ qryStmtAnalysis()
 Function to query the most often used statements. The number of results can be configured through a
 limit in the configuration file - cnf.file - (qryStatementAnalysisLimit).
 }
-

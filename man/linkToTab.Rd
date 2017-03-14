@@ -9,4 +9,3 @@ linkToTab(link, msg)
 \description{
 ...
 }
-

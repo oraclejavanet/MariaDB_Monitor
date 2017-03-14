@@ -4,9 +4,8 @@
 \alias{qryMaxInfo}
 \title{Query maxscale user}
 \usage{
-qryMaxInfo(what)
+qryMaxInfo(procList, what)
 }
 \description{
 Function to query maxinfo
 }
-

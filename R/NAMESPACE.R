@@ -11,7 +11,7 @@
 #' rHandsontableOutput hot_to_r
 #' @importFrom xts xts
 #' @importFrom DT datatable formatCurrency formatStyle dataTableOutput styleColorBar
-#' styleInterval formatRound renderDataTable
+#' styleInterval formatRound renderDataTable dataTableProxy replaceData
 #' @importFrom dbtools Credentials sendQuery testConnection
 #' @importFrom tidyr spread gather_
 #' @importFrom RMySQL MySQL dbConnect dbDisconnect dbSendQuery
@@ -154,6 +154,12 @@ DT::formatRound
 
 #' @export
 DT::renderDataTable
+
+#' @export
+DT::dataTableProxy
+
+#' @export
+DT::replaceData
 
 #' @export
 magrittr::`%>%`

@@ -145,9 +145,13 @@ grepLine <- function(file, what) {
 #'
 #' @export
 initDbServer <- function() {
-  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
-  grepLine(sqlCredFile, "host=") %p0% ":" %p0% grepLine(sqlCredFile, "port=")
 
+  if (exists(".initDbServer")) return(.initDbServer)
+
+  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
+  .initDbServer <<- grepLine(sqlCredFile, "host=") %p0% ":" %p0% grepLine(sqlCredFile, "port=")
+
+  return(.initDbServer)
 }
 
 # reactive function for database credentials
@@ -259,3 +263,151 @@ linkToTab <- function(link, msg){
 asNum <- function(x) {
   tryCatch(suppressWarnings(as.numeric(x)), error = function(e) NA)
 }
+
+#' mutate process data
+#'
+#' ...
+#'
+#' @export
+procToTimeLine <- function(timeData) {
+
+  # datahandling for calculating tot_connections, tot_memory and run_connections
+  timeData <- timeData %>%
+    group_by(COMMAND) %>%
+    summarise(CONNECTIONS = n(),
+              TIME = sum(TIME),
+              MEMORY_USED = sum(MEMORY_USED),
+              DATETIME = max(DATETIME)) %>%
+    data.frame
+
+  timeData <- timeData %>%
+    mutate(MEMORY_USED = MEMORY_USED / 1024 / 1024) %>%
+    rbind(.,
+          c(COMMAND = "Total",
+            unlist(c(timeData %>%
+                       group_by(DATETIME)  %>%
+                       summarise(CONNECTIONS = sum(CONNECTIONS), TIME = sum(TIME), MEMORY_USED = sum(MEMORY_USED / 1024 / 1024)) %>%
+                       select(CONNECTIONS, TIME, MEMORY_USED, DATETIME)
+            )
+            )
+          )
+    ) %>%
+    filter(COMMAND %in% c('Total', 'Query')) %>%
+    summarise(DATETIME = max(DATETIME),
+              TOT_CONNECTIONS = max(CONNECTIONS),
+              TOT_MEMORY = max(MEMORY_USED),
+              RUN_CONNECTIONS = min(CONNECTIONS)) %>%
+    data.frame
+
+  timeData$DATETIME <- strptime(timeData$DATETIME, format = "%H:%M:%S")
+  timeData <- xts(timeData[, -1], order.by = timeData[, 1], tzone = appDbTz)
+
+  return(timeData)
+
+}
+
+#' get flag slave server exist from process data
+#'
+#' ...
+#'
+#' @export
+procSlaveServer <- function(procList) {
+
+  # if (exists(".slaveServer")) return(.slaveServer)
+
+  if (length(grep("Binlog Dump", procList$COMMAND)) == 0) return(NULL)
+
+  .slaveServer <- procList %>%
+    filter(grepl("Binlog Dump", COMMAND)) %>%
+    mutate(HOST = strsplit(HOST, ":")[[1]][1] %p0% ":3306")
+
+  return(.slaveServer)
+
+}
+
+#' get flag maxscale exist from process data
+#'
+#' ...
+#'
+#' @export
+procMaxscale <- function(procList) {
+
+  if (length(grep("maxscale", procList$USER)) == 0) return(NULL)
+
+  procList %>%
+    filter(grepl("maxscale", USER)) %>%
+    mutate(HOST = strsplit(HOST, ":")[[1]][1],
+           PORT = 9003)
+
+}
+
+#' clean process data
+#'
+#' ...
+#'
+#' @export
+cleanProcList <- function(procList) {
+
+  procList %>%
+    mutate(MEMORY_USED = formatIECBytes(MEMORY_USED),
+           TIME = as.character(seconds_to_period(TIME)),
+           ID = as.character(ID)) %>%
+    select(-DATETIME)
+
+}
+
+#' clean global vars for buffer pool reads
+#'
+#' ...
+#'
+#' @export
+bufferReads <- function(serverVars) {
+
+  serverVars %>%
+    filter(VARIABLE_NAME %in% c('innodb_buffer_pool_reads', 'innodb_buffer_pool_read_requests',
+                   'innodb_buffer_pool_write_requests')) %>%
+    mutate(VARIABLE_VALUE_SEC = NA)
+
+}
+
+#' clean list of server variables
+#'
+#' ...
+#'
+#' @export
+cleanVarList <- function(varList) {
+
+  varList %>%
+    select(-DATETIME)
+
+}
+
+#' clean global vars for log write statistic
+#'
+#' ...
+#'
+#' @export
+cleanLogWrites <- function(varList) {
+
+  filter <- switch(qryFlagTokuEngine(),
+                   c("innodb_os_log_written", "innodb_log_write_requests", "innodb_log_writes"),
+                   c("tokudb_logger_writes_bytes", "tokudb_logger_writes", "innodb_os_log_written",
+                     "innodb_log_write_requests", "innodb_log_writes"))
+
+
+  varList %>%
+    filter(VARIABLE_NAME %in% filter) %>%
+    mutate(VARIABLE_VALUE = ifelse(VARIABLE_NAME %in% c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"),
+                                   as.numeric(VARIABLE_VALUE) / 1024 / 1024,
+                                   VARIABLE_VALUE),
+           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"), "LOG_WRITES_OS_MB",
+                                  VARIABLE_NAME),
+           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_LOG_WRITES", "TOKUDB_LOGGER_WRITES"), "LOG_WRITES", VARIABLE_NAME)) %>%
+    group_by(VARIABLE_NAME) %>%
+    summarise(VARIABLE_VALUE = sum(as.numeric(VARIABLE_VALUE)),
+              DATETIME = first(DATETIME),
+              VARIABLE_VALUE_SEC = NA) %>%
+    data.frame
+
+}
+

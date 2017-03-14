@@ -11,4 +11,3 @@ Function to query statements with errors or warnings. The number of results can 
 configuration file - cnf.file - (qryFilterErrors, qryFilterWarnings). Statements with more errors or warnings then the threshold
 will be in the result set.
 }
-

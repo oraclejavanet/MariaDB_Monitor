@@ -9,4 +9,3 @@ reloadBySchedule(dat, schedule, session = getDefaultReactiveDomain())
 \description{
 ...
 }
-

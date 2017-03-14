@@ -9,4 +9,3 @@ compress(x, round.by = 2)
 \description{
 ...
 }
-

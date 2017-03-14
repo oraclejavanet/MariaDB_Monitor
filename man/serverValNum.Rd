@@ -9,4 +9,3 @@ serverValNum(dat, name)
 \description{
 ...
 }
-

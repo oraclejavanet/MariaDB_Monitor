@@ -9,4 +9,3 @@ qryIdxNullable()
 \description{
 Function to query the indices with null values.
 }
-

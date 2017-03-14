@@ -9,4 +9,3 @@ bufferDat(dat)
 \description{
 ...
 }
-

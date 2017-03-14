@@ -5,14 +5,9 @@
 #' @export
 qryServStatData <- function() {
   # Load Status Variables
-  innoDBstat <- queryDB("Select * from information_schema.GLOBAL_STATUS;")
-
-  # Load Global Variables
-  mySQLvars <- queryDB("SHOW GLOBAL VARIABLES;") %>%
-    rename(VARIABLE_NAME = Variable_name, VARIABLE_VALUE = Value)
-
-  # Combine Status and Global Variables-Dataset
-  innoDBstat <- rbind(innoDBstat, mySQLvars) %>%
+  innoDBstat <- queryDB("Select *, CURRENT_TIMESTAMP() as DATETIME from information_schema.GLOBAL_STATUS
+                         UNION ALL
+                         Select *, CURRENT_TIMESTAMP() as DATETIME from information_schema.GLOBAL_VARIABLES;") %>%
     mutate(VARIABLE_NAME = tolower(VARIABLE_NAME))
 
   # Insert new Variables in Dataset
@@ -137,13 +132,8 @@ qryServStatData <- function() {
 qryProcData <- function() {
 
   mySQLprocessList <- queryDB("SELECT `ID`, `USER`, `HOST`, `DB`, `COMMAND`, `TIME`, `PROGRESS`, `STATE`, `MEMORY_USED`,
-                              `EXAMINED_ROWS`, substr(`INFO`, 1, 120) as INFO FROM `information_schema`.`PROCESSLIST`;")
-
-  ## Human Readable Transformation
-  mySQLprocessList <- mySQLprocessList %>%
-    mutate(MEMORY_USED = formatIECBytes(MEMORY_USED),
-           TIME = as.character(seconds_to_period(TIME)),
-           ID = as.character(ID))
+                              `EXAMINED_ROWS`, substr(`INFO`, 1, 120) as INFO, CURRENT_TIME() as DATETIME
+                              FROM `information_schema`.`PROCESSLIST`;")
 
   return(mySQLprocessList)
 
@@ -157,7 +147,7 @@ qryProcData <- function() {
 #' @export
 qryStmtAnalysis <- function() {
 
-  statementAnalysisData     <- queryDB("
+  statementAnalysisData <- queryDB("
         SELECT
           `COUNT_STAR` as exec_count
           , `AVG_TIMER_WAIT` AS `avg_latency`
@@ -419,92 +409,6 @@ qryIdxData <- function() {
 
 }
 
-#' Aggregated processlist
-#'
-#' Function to query semi-aggregated process data of mariadb. Output of the function is an xts object.
-#'
-#' @export
-qryTimeLine <- function() {
-
-  timeData <- queryDB("SELECT COMMAND, count( * ) as CONNECTIONS, sum(TIME) as TIME, sum(MEMORY_USED) as MEMORY_USED,
-                      CURRENT_TIME() as DATETIME
-                      FROM `information_schema`.`PROCESSLIST`
-                      group by COMMAND;")
-
-  # datahandling for calculating tot_connections, tot_memory and run_connections
-  timeData <- timeData %>%
-    mutate(MEMORY_USED = MEMORY_USED / 1024 / 1024) %>%
-    rbind(.,
-          c(COMMAND = "Total",
-            unlist(c(timeData %>%
-                       group_by(DATETIME)  %>%
-                       summarise(CONNECTIONS = sum(CONNECTIONS), TIME = sum(TIME), MEMORY_USED = sum(MEMORY_USED / 1024 / 1024)) %>%
-                       select(CONNECTIONS, TIME, MEMORY_USED, DATETIME)
-                     )
-                   )
-            )
-    ) %>%
-    filter(COMMAND %in% c('Total', 'Query')) %>%
-    summarise(DATETIME = max(DATETIME),
-              TOT_CONNECTIONS = max(CONNECTIONS),
-              TOT_MEMORY = max(MEMORY_USED),
-              RUN_CONNECTIONS = min(CONNECTIONS)) %>%
-    data.frame
-
-  timeData$DATETIME <- strptime(timeData$DATETIME, format = "%H:%M:%S")
-  timeData <- xts(timeData[, -1], order.by = timeData[, 1], tzone = appDbTz)
-
-  return(timeData)
-
-}
-
-#' Log writes
-#'
-#' Function to query statistics of log writes of mariadb.
-#'
-#' @export
-qryLogWrites <- function() {
-
-  filter <- ifelse(qryFlagTokuEngine(),
-                   "'Tokudb_logger_writes_bytes', 'Tokudb_logger_writes', 'Innodb_os_log_written',
-                     'Innodb_log_write_requests', 'Innodb_log_writes'",
-                   "'Innodb_os_log_written', 'Innodb_log_write_requests', 'Innodb_log_writes'")
-
-  logWriteData <- queryDB("Select * , CURRENT_TIMESTAMP() as DATETIME, NULL as VARIABLE_VALUE_SEC from information_schema.GLOBAL_STATUS
-                          where VARIABLE_NAME in (" %p0% filter %p0% ");")
-
-  logWriteData <- logWriteData %>%
-    mutate(VARIABLE_VALUE = ifelse(VARIABLE_NAME %in% c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"),
-                                 as.numeric(VARIABLE_VALUE) / 1024 / 1024,
-                                 VARIABLE_VALUE),
-           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_OS_LOG_WRITTEN", "TOKUDB_LOGGER_WRITES_BYTES"), "LOG_WRITES_OS_MB",
-                                VARIABLE_NAME),
-           VARIABLE_NAME = ifelse(VARIABLE_NAME %in%  c("INNODB_LOG_WRITES", "TOKUDB_LOGGER_WRITES"), "LOG_WRITES", VARIABLE_NAME)) %>%
-    group_by(VARIABLE_NAME) %>%
-    summarise(VARIABLE_VALUE = sum(as.numeric(VARIABLE_VALUE)),
-              DATETIME = first(DATETIME),
-              VARIABLE_VALUE_SEC = NA) %>%
-    data.frame
-
-  return(logWriteData)
-
-}
-
-#' InnoDB buffer reads
-#'
-#' Function to query statistics of buffer reads of mariadb.
-#'
-#' @export
-qryBufferReads <- function() {
-
-  bufferReadsData <- queryDB("Select * , CURRENT_TIMESTAMP() as DATETIME, NULL as VARIABLE_VALUE_SEC from information_schema.GLOBAL_STATUS
-                             where VARIABLE_NAME in ('innodb_buffer_pool_reads', 'innodb_buffer_pool_read_requests',
-                             'Innodb_buffer_pool_write_requests');")
-
-  return(bufferReadsData)
-
-}
-
 #' InnoDB Status
 #'
 #' Function to query operational information about the innodb storage engine.
@@ -593,22 +497,6 @@ qryErrWarnData <- function() {
 
 }
 
-#' Query Slave Servers
-#'
-#' Function to query the host and port of the slave servers (if exist)
-#'
-#' @export
-qrySlaveServers <- function() {
-
-  slaveServerData <- queryDB("SELECT * FROM information_schema.PROCESSLIST WHERE COMMAND = 'Binlog Dump';")
-
-  if (nrow(slaveServerData) == 0) return(NULL)
-
-  slaveServerData %>%
-    mutate(HOST = strsplit(HOST, ":")[[1]][1] %p0% ":3306")
-
-}
-
 #' Check if TokuDB-Storage-Engine is in use
 #'
 #' Function to check if TokuDB-Storage-Engine is in use
@@ -616,27 +504,12 @@ qrySlaveServers <- function() {
 #' @export
 qryFlagTokuEngine <- function() {
 
-  flagTokuEngine <- queryDB("SELECT if(sum(if(`ENGINE` = 'TokuDB',1,0)) = 0, 0, 1) as flagTokuEngine
-                             FROM information_schema.`TABLES`;")
+  if (exists(".flagTokuEngine", globalenv())) return (.flagTokuEngine)
 
-  return(flagTokuEngine$flagTokuEngine)
+  .flagTokuEngine <<- as.numeric(queryDB("SELECT if(sum(if(`ENGINE` = 'TokuDB',1,0)) = 0, 1, 2) as flagTokuEngine
+                             FROM information_schema.`TABLES`;"))
 
-}
-
-#' Query maxscale user
-#'
-#' Function to query the host of maxscale user (if exist)
-#'
-#' @export
-qryMaxscale <- function() {
-
-  maxScaleData <- queryDB("SELECT * FROM information_schema.PROCESSLIST WHERE USER = 'maxscale';")
-
-  if (nrow(maxScaleData) == 0) return(NULL)
-
-  maxScaleData %>%
-    mutate(HOST = strsplit(HOST, ":")[[1]][1],
-           PORT = 9003)
+  return(.flagTokuEngine)
 
 }
 
@@ -645,11 +518,11 @@ qryMaxscale <- function() {
 #' Function to query maxinfo
 #'
 #' @export
-qryMaxInfo <- function(what) {
+qryMaxInfo <- function(procList, what) {
 
-  if (is.null(qryMaxscale())) return(NULL)
+  if (is.null(procMaxscale(procList))) return(NULL)
 
-  queryDB("show " %p0% what, "host=" %p0% qryMaxscale()$HOST, "port=" %p0% qryMaxscale()$PORT)
+  queryDB("show " %p0% what, "host=" %p0% procMaxscale(procList)$HOST, "port=" %p0% procMaxscale(procList)$PORT)
 
 }
 

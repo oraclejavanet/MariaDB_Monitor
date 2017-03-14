@@ -2,55 +2,106 @@
 % Please edit documentation in R/NAMESPACE.R
 \docType{import}
 \name{reexports}
-\alias{\%>\%}
+\alias{reexports}
+\alias{renderTable}
+\alias{reexports}
 \alias{box}
-\alias{dashboardBody}
+\alias{reexports}
 \alias{dashboardHeader}
-\alias{dashboardPage}
-\alias{dashboardSidebar}
-\alias{dataTableOutput}
-\alias{datatable}
-\alias{dropdownMenu}
-\alias{dropdownMenuOutput}
-\alias{dyAxis}
-\alias{dyHighlight}
-\alias{dyLegend}
-\alias{dyOptions}
-\alias{dyRangeSelector}
-\alias{dySeries}
-\alias{dygraph}
-\alias{dygraphOutput}
-\alias{filter}
-\alias{formatCurrency}
-\alias{formatIECBytes}
-\alias{formatRound}
-\alias{formatStyle}
-\alias{gvisBarChart}
-\alias{gvisPieChart}
-\alias{hot_col}
-\alias{hot_to_r}
-\alias{menuItem}
-\alias{mutate}
+\alias{reexports}
 \alias{notificationItem}
+\alias{reexports}
+\alias{dashboardSidebar}
+\alias{reexports}
+\alias{dashboardBody}
+\alias{reexports}
+\alias{dashboardPage}
+\alias{reexports}
+\alias{dropdownMenuOutput}
+\alias{reexports}
+\alias{dropdownMenu}
+\alias{reexports}
+\alias{sidebarSearchForm}
+\alias{reexports}
+\alias{tabItem}
+\alias{reexports}
+\alias{tabBox}
+\alias{reexports}
+\alias{sidebarMenu}
+\alias{reexports}
+\alias{menuItem}
+\alias{reexports}
+\alias{tabItems}
+\alias{reexports}
+\alias{gvisBarChart}
+\alias{reexports}
+\alias{renderGvis}
+\alias{reexports}
+\alias{gvisPieChart}
+\alias{reexports}
+\alias{formatIECBytes}
+\alias{reexports}
+\alias{seconds_to_period}
+\alias{reexports}
+\alias{dygraphOutput}
+\alias{reexports}
+\alias{renderDygraph}
+\alias{reexports}
+\alias{dygraph}
+\alias{reexports}
+\alias{dyAxis}
+\alias{reexports}
+\alias{dySeries}
+\alias{reexports}
+\alias{dyOptions}
+\alias{reexports}
+\alias{dyLegend}
+\alias{reexports}
+\alias{dyRangeSelector}
+\alias{reexports}
+\alias{dyHighlight}
+\alias{reexports}
+\alias{renderRHandsontable}
+\alias{reexports}
+\alias{rhandsontable}
+\alias{reexports}
+\alias{hot_col}
+\alias{reexports}
 \alias{rHandsontableOutput}
 \alias{reexports}
-\alias{renderDataTable}
-\alias{renderDygraph}
-\alias{renderGvis}
-\alias{renderRHandsontable}
-\alias{renderTable}
-\alias{rhandsontable}
-\alias{seconds_to_period}
-\alias{sidebarMenu}
-\alias{sidebarSearchForm}
-\alias{spread}
-\alias{styleColorBar}
-\alias{styleInterval}
-\alias{tabBox}
-\alias{tabItem}
-\alias{tabItems}
+\alias{hot_to_r}
+\alias{reexports}
 \alias{xts}
+\alias{reexports}
+\alias{datatable}
+\alias{reexports}
+\alias{formatCurrency}
+\alias{reexports}
+\alias{formatStyle}
+\alias{reexports}
+\alias{dataTableOutput}
+\alias{reexports}
+\alias{styleColorBar}
+\alias{reexports}
+\alias{styleInterval}
+\alias{reexports}
+\alias{formatRound}
+\alias{reexports}
+\alias{renderDataTable}
+\alias{reexports}
+\alias{dataTableProxy}
+\alias{reexports}
+\alias{replaceData}
+\alias{reexports}
+\alias{\%>\%}
+\alias{reexports}
+\alias{filter}
+\alias{reexports}
+\alias{mutate}
+\alias{reexports}
+\alias{spread}
 \title{Objects exported from other packages}
+\keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.
@@ -58,7 +109,7 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{filter}}, \code{\link[dplyr]{mutate}}}
 
-  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}}
+  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}, \code{\link[DT]{dataTableProxy}}, \code{\link[DT]{replaceData}}}
 
   \item{dygraphs}{\code{\link[dygraphs]{dygraphOutput}}, \code{\link[dygraphs]{renderDygraph}}, \code{\link[dygraphs]{dygraph}}, \code{\link[dygraphs]{dyAxis}}, \code{\link[dygraphs]{dySeries}}, \code{\link[dygraphs]{dyOptions}}, \code{\link[dygraphs]{dyLegend}}, \code{\link[dygraphs]{dyRangeSelector}}, \code{\link[dygraphs]{dyHighlight}}}
 
@@ -80,5 +131,4 @@ below to see their documentation.
 
   \item{xts}{\code{\link[xts]{xts}}}
 }}
-\keyword{internal}
 
