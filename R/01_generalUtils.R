@@ -145,9 +145,13 @@ grepLine <- function(file, what) {
 #'
 #' @export
 initDbServer <- function() {
-  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
-  grepLine(sqlCredFile, "host=") %p0% ":" %p0% grepLine(sqlCredFile, "port=")
 
+  if (exists(".initDbServer")) return(.initDbServer)
+
+  sqlCredFile <- readLines("~/.INWTdbMonitor/cnf.file")
+  .initDbServer <<- grepLine(sqlCredFile, "host=") %p0% ":" %p0% grepLine(sqlCredFile, "port=")
+
+  return(.initDbServer)
 }
 
 # reactive function for database credentials
@@ -309,11 +313,15 @@ procToTimeLine <- function(timeData) {
 #' @export
 procSlaveServer <- function(procList) {
 
+  # if (exists(".slaveServer")) return(.slaveServer)
+
   if (length(grep("Binlog Dump", procList$COMMAND)) == 0) return(NULL)
 
-  procList %>%
+  .slaveServer <- procList %>%
     filter(grepl("Binlog Dump", COMMAND)) %>%
     mutate(HOST = strsplit(HOST, ":")[[1]][1] %p0% ":3306")
+
+  return(.slaveServer)
 
 }
 

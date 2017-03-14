@@ -506,8 +506,8 @@ qryFlagTokuEngine <- function() {
 
   if (exists(".flagTokuEngine", globalenv())) return (.flagTokuEngine)
 
-  .flagTokuEngine <<- queryDB("SELECT if(sum(if(`ENGINE` = 'TokuDB',1,0)) = 0, 1, 2) as flagTokuEngine
-                             FROM information_schema.`TABLES`;")
+  .flagTokuEngine <<- as.numeric(queryDB("SELECT if(sum(if(`ENGINE` = 'TokuDB',1,0)) = 0, 1, 2) as flagTokuEngine
+                             FROM information_schema.`TABLES`;"))
 
   return(.flagTokuEngine)
 

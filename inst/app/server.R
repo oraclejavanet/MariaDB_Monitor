@@ -80,7 +80,7 @@ shinyServer(function(input, output, session) {
   # Select DB-Servers in Master-Slave-Replication ---------------------------------
   output$serverList <- renderUI({
     selectInput(inputId = "serverList", label = h4("Select server:"),
-                choices =  Filter(Negate(is.null), list(initDbServer(), procSlaveServer(mySQLprocessList())$HOST))
+                choices =  Filter(Negate(is.null), list(initDbServer(), isolate(procSlaveServer(mySQLprocessList())$HOST)))
     )
   })
 
@@ -91,7 +91,7 @@ shinyServer(function(input, output, session) {
   )
 
   # create static values ---------------------------------
-  output$buffTot <- renderText(ifelse(qryFlagTokuEngine(),
+  output$buffTot <- renderText(ifelse(qryFlagTokuEngine() == 2,
        paste0("Buffer Pool (", paste0(formatIECBytes(serverValNum(cleanVarList(innoDBstat()),
             c("KPI_bufPoolSize", "tokudb_cache_size"))), collapse = " + "), ")"),
        paste0("InnoDB Buffer Pool (", formatIECBytes(serverValNum(cleanVarList(innoDBstat()), "KPI_bufPoolSize")), ")")
@@ -528,43 +528,56 @@ shinyServer(function(input, output, session) {
   })
 
   # PieCharts
-  output$plotBufferFree <- ifelse(qryFlagTokuEngine(),
-                                  renderGvis({
-                                    gvisBarChart(isolate(bufferDat(cleanVarList(innoDBstat()))), xvar = "engine",
-                                                 yvar = c("Filled", "Free"),
-                                                 options = list(hAxis = "{format:'#,###%'}", isStacked = TRUE,
-                                                                colors = "['#4CAF50','#FF9800']"))
-                                  })
-                                  ,
-                                  renderGvis({
-                                    appPieChart(label = c("Free", "Filled"),
-                                                value = isolate(
-                                                  c(serverValNum(cleanVarList(innoDBstat())), "innodb_buffer_pool_pages_free",
-                                                    serverValNum(cleanVarList(innoDBstat())), "innodb_buffer_pool_pages_total" -
-                                                    serverValNum(cleanVarList(innoDBstat()))), "innodb_buffer_pool_pages_free")
-                                    )
-                                  })
-  )
-
-  output$plotBufferHitrate <- renderGvis({
-    appPieChart(label = c("Reads", "Requests"),
-    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_reads"),
-                      serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_read_requests")))
+  observe({
+    input$serverList
+    output$plotBufferFree <- ifelse(qryFlagTokuEngine() == 2,
+                                    renderGvis({
+                                      gvisBarChart(isolate(bufferDat(cleanVarList(innoDBstat()))), xvar = "engine",
+                                                   yvar = c("Filled", "Free"),
+                                                   options = list(hAxis = "{format:'#,###%'}", isStacked = TRUE,
+                                                                  colors = "['#4CAF50','#FF9800']"))
+                                    })
+                                    ,
+                                    renderGvis({
+                                      appPieChart(label = c("Free", "Filled"),
+                                                  value = isolate(c(serverValNum(cleanVarList(innoDBstat())),
+                                                                    "innodb_buffer_pool_pages_free",
+                                                      serverValNum(cleanVarList(innoDBstat())), "innodb_buffer_pool_pages_total" -
+                                                      serverValNum(cleanVarList(innoDBstat()))), "innodb_buffer_pool_pages_free")
+                                      )
+                                    })
     )
   })
 
-  output$plotTableCacheHitrate <- renderGvis({
-    appPieChart(label = c("Closed", "Open"),
-    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "opened_tables") -
-                serverValNum(cleanVarList(innoDBstat()), "open_tables"), serverValNum(cleanVarList(innoDBstat()), "open_tables")))
-    )
+  observe({
+    input$serverList
+    output$plotBufferHitrate <- renderGvis({
+      appPieChart(label = c("Reads", "Requests"),
+      value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_reads"),
+                        serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_read_requests")))
+      )
+    })
   })
 
-  output$plotTempTables <- renderGvis({
-    appPieChart(label = c("On disk", "In memory"),
-    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "created_tmp_disk_tables"),
-              serverValNum(cleanVarList(innoDBstat()), "created_tmp_tables"))), badColor = "#F44336"
-    )
+  observe({
+    input$serverList
+    output$plotTableCacheHitrate <- renderGvis({
+      appPieChart(label = c("Closed", "Open"),
+      value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "opened_tables") -
+                  serverValNum(cleanVarList(innoDBstat()), "open_tables"), serverValNum(cleanVarList(innoDBstat()), "open_tables")))
+      )
+    })
+  })
+
+
+  observe({
+    input$serverList
+    output$plotTempTables <- renderGvis({
+      appPieChart(label = c("On disk", "In memory"),
+      value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "created_tmp_disk_tables"),
+                serverValNum(cleanVarList(innoDBstat()), "created_tmp_tables"))), badColor = "#F44336"
+      )
+    })
   })
 
 
@@ -576,7 +589,7 @@ shinyServer(function(input, output, session) {
                                        paste0("No. Processes: ", length(mySQLprocessList()$USER)),
                                        paste0("Open Tables: ", serverVal(cleanVarList(innoDBstat()), "open_tables")),
                                        paste0("Buffer: ",
-                                              ifelse(qryFlagTokuEngine(),
+                                              ifelse(qryFlagTokuEngine() == 2,
                                                      formatIECBytes(bufferTotDat(cleanVarList(innoDBstat()))),
                                                      serverVal(cleanVarList(innoDBstat()), "innodb_buffer_pool_bytes_data")
                                                      )

@@ -89,6 +89,10 @@
 \alias{reexports}
 \alias{renderDataTable}
 \alias{reexports}
+\alias{dataTableProxy}
+\alias{reexports}
+\alias{replaceData}
+\alias{reexports}
 \alias{\%>\%}
 \alias{reexports}
 \alias{filter}
@@ -105,7 +109,7 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr]{filter}}, \code{\link[dplyr]{mutate}}}
 
-  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}}
+  \item{DT}{\code{\link[DT]{datatable}}, \code{\link[DT]{formatCurrency}}, \code{\link[DT]{formatStyle}}, \code{\link[DT]{dataTableOutput}}, \code{\link[DT]{styleColorBar}}, \code{\link[DT]{styleInterval}}, \code{\link[DT]{formatRound}}, \code{\link[DT]{renderDataTable}}, \code{\link[DT]{dataTableProxy}}, \code{\link[DT]{replaceData}}}
 
   \item{dygraphs}{\code{\link[dygraphs]{dygraphOutput}}, \code{\link[dygraphs]{renderDygraph}}, \code{\link[dygraphs]{dygraph}}, \code{\link[dygraphs]{dyAxis}}, \code{\link[dygraphs]{dySeries}}, \code{\link[dygraphs]{dyOptions}}, \code{\link[dygraphs]{dyLegend}}, \code{\link[dygraphs]{dyRangeSelector}}, \code{\link[dygraphs]{dyHighlight}}}
 
