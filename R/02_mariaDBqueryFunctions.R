@@ -5,9 +5,9 @@
 #' @export
 qryServStatData <- function() {
   # Load Status Variables
-  innoDBstat <- queryDB("Select * from information_schema.GLOBAL_STATUS
+  innoDBstat <- queryDB("Select *, CURRENT_TIMESTAMP() as DATETIME from information_schema.GLOBAL_STATUS
                          UNION ALL
-                         Select * from information_schema.GLOBAL_VARIABLES;") %>%
+                         Select *, CURRENT_TIMESTAMP() as DATETIME from information_schema.GLOBAL_VARIABLES;") %>%
     mutate(VARIABLE_NAME = tolower(VARIABLE_NAME))
 
   # Insert new Variables in Dataset
@@ -438,21 +438,6 @@ qryLogWrites <- function() {
     data.frame
 
   return(logWriteData)
-
-}
-
-#' InnoDB buffer reads
-#'
-#' Function to query statistics of buffer reads of mariadb.
-#'
-#' @export
-qryBufferReads <- function() {
-
-  bufferReadsData <- queryDB("Select * , CURRENT_TIMESTAMP() as DATETIME, NULL as VARIABLE_VALUE_SEC from information_schema.GLOBAL_STATUS
-                             where VARIABLE_NAME in ('innodb_buffer_pool_reads', 'innodb_buffer_pool_read_requests',
-                             'Innodb_buffer_pool_write_requests');")
-
-  return(bufferReadsData)
 
 }
 

@@ -7,7 +7,7 @@
 #' @export
 appDataTable <- function(x) {
   datatable(x,
-            options = list(pageLength = 50, searching = FALSE, paging = FALSE, info = FALSE))
+            options = list(pageLength = 50, searching = FALSE, paging = FALSE, info = FALSE, processing = FALSE))
 }
 
 #' Piechart

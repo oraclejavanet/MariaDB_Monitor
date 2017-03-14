@@ -64,7 +64,7 @@ shinyServer(function(input, output, session) {
 
   innoDBstat <- reactive({
     input$serverList
-    reloadBySchedule(dat = qryServStatData(), schedule = "halfHourly")
+    reloadBySchedule(dat = qryServStatData(), schedule = "each5Seconds")
     })
 
   mySQLprocessList <- reactive({
@@ -92,14 +92,14 @@ shinyServer(function(input, output, session) {
 
   # create static values ---------------------------------
   output$buffTot <- renderText(ifelse(qryFlagTokuEngine(),
-       paste0("Buffer Pool (", paste0(formatIECBytes(serverValNum(innoDBstat(),
+       paste0("Buffer Pool (", paste0(formatIECBytes(serverValNum(cleanVarList(innoDBstat()),
             c("KPI_bufPoolSize", "tokudb_cache_size"))), collapse = " + "), ")"),
-       paste0("InnoDB Buffer Pool (", formatIECBytes(serverValNum(innoDBstat(), "KPI_bufPoolSize")), ")")
+       paste0("InnoDB Buffer Pool (", formatIECBytes(serverValNum(cleanVarList(innoDBstat()), "KPI_bufPoolSize")), ")")
   ))
 
-  output$maxCon     <- renderText(paste0("Maximum number of connections: ", serverVal(innoDBstat(), "max_connections"), " (multiplied
-                                    with following values leading to maximum use of ", serverVal(innoDBstat(), "ThreadMemAllocated"),
-                                    " total thread memory and ", serverVal(innoDBstat(), "memOverallovated"), " overallocated memory)"))
+  output$maxCon     <- renderText(paste0("Maximum number of connections: ", serverVal(cleanVarList(innoDBstat()), "max_connections"), " (multiplied
+                                    with following values leading to maximum use of ", serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated"),
+                                    " total thread memory and ", serverVal(cleanVarList(innoDBstat()), "memOverallovated"), " overallocated memory)"))
   # html manipulations ---------------------------------
   output$innoDBStatus <- renderUI({
 
@@ -126,7 +126,7 @@ shinyServer(function(input, output, session) {
     logWriteDat <- qryLogWrites()
     isolate(values$logWrite <- helperBufferWrite(values$logWrite, logWriteDat))
 
-    bufferReadsDat <- qryBufferReads()
+    bufferReadsDat <- bufferReads(innoDBstat())
     isolate(values$bufferReads <- helperBufferWrite(values$bufferReads, bufferReadsDat))
 
   })
@@ -139,15 +139,15 @@ shinyServer(function(input, output, session) {
   })
 
   output$tblMemStatGlob <- renderTable({
-    dplyr::filter(innoDBstat(), VARIABLE_NAME %in% globalMemVars)
+    dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% globalMemVars)
   })
 
   output$tblMemStatThread <- renderTable({
-    dplyr::filter(innoDBstat(), VARIABLE_NAME %in% perConnectionMemVars)
+    dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% perConnectionMemVars)
   })
 
   output$tblVariables <- renderDataTable({
-    innoDBstat()
+    cleanVarList(innoDBstat())
   })
 
   output$tblProcessActive <- renderTable({
@@ -160,74 +160,104 @@ shinyServer(function(input, output, session) {
 
   # DT:renderDataTables
   output$tblTmpTables <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% tmpTableStatVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tmpTableStatVars)))
     )
   })
 
   output$tblTblLock <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% tblLockingVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblLockingVars)))
     )
   })
 
   output$tblSlowQry <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% slowQryVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% slowQryVars)))
     )
   })
 
   output$tblWorkThread <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% workerThreadsVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% workerThreadsVars)))
     )
   })
 
   output$tblKeyBuffSize <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% keyBufferSizeVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% keyBufferSizeVars)))
     )
   })
 
   output$tblQryCache <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% qryCacheVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% qryCacheVars)))
     )
   })
 
   output$tblSortOp <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% sortOpVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% sortOpVars)))
     )
   })
 
   output$tblJoins <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% joinVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% joinVars)))
     )
   })
 
   output$tblTblScan <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% tblScansVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblScansVars)))
     )
   })
 
   output$tblBinlogCache <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% tblBinlogVars))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblBinlogVars)))
     )
   })
 
   output$tblAbortCon <- DT::renderDataTable({
-    appDataTable(transformThousends(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% abortedCons))
+    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% abortedCons)))
     )
   })
 
-  # DT:renderDataTables
   output$tblUsedCon <- DT::renderDataTable({
-    datatable(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% usedConVars), options = list(pageLength = 50, searching = FALSE,
-                                                                                 paging = FALSE, info = FALSE)) %>%
+    datatable(isolate(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars)),
+              options = list(pageLength = 50, searching = FALSE, paging = FALSE, info = FALSE)) %>%
       formatCurrency(columns = 'VARIABLE_VALUE', currency = "", interval = 3, mark = " ", digits = 0) %>%
       formatStyle(
         'VARIABLE_VALUE',
-        background = styleColorBar(as.numeric(dplyr::filter(innoDBstat(), VARIABLE_NAME %in% usedConVars)$VARIABLE_VALUE), 'steelblue'),
+        background = styleColorBar(as.numeric(isolate(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars)$VARIABLE_VALUE)), 'steelblue'),
         backgroundSize = '100% 90%',
         backgroundRepeat = 'no-repeat',
         backgroundPosition = 'center'
       )
   })
 
+  # proxy for data tables
+  proxyTblTmpTables <- dataTableProxy('tblTmpTables')
+  proxyTblTblLock <- dataTableProxy('tblTblLock')
+  proxyTblSlowQry <- dataTableProxy('tblSlowQry')
+  proxyTblWorkThread <- dataTableProxy('tblWorkThread')
+  proxyTblKeyBuffSize <- dataTableProxy('tblKeyBuffSize')
+  proxyTblQryCache <- dataTableProxy('tblQryCache')
+  proxyTblSortOp <- dataTableProxy('tblSortOp')
+  proxyTblJoins <- dataTableProxy('tblJoins')
+  proxyTblTblScan <- dataTableProxy('tblTblScan')
+  proxyTblBinlogCache <- dataTableProxy('tblBinlogCache')
+  proxyTblAbortCon <- dataTableProxy('tblAbortCon')
+  proxyTblUsedConn <- dataTableProxy('tblUsedCon')
+
+  # observe for data tables
+  observe({
+    replaceData(proxyTblTmpTables, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tmpTableStatVars))), resetPaging = FALSE)
+    replaceData(proxyTblTblLock, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblLockingVars))), resetPaging = FALSE)
+    replaceData(proxyTblSlowQry, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% slowQryVars))), resetPaging = FALSE)
+    replaceData(proxyTblWorkThread, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% workerThreadsVars))), resetPaging = FALSE)
+    replaceData(proxyTblKeyBuffSize, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% keyBufferSizeVars))), resetPaging = FALSE)
+    replaceData(proxyTblQryCache, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% qryCacheVars))), resetPaging = FALSE)
+    replaceData(proxyTblSortOp, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% sortOpVars))), resetPaging = FALSE)
+    replaceData(proxyTblJoins, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% joinVars))), resetPaging = FALSE)
+    replaceData(proxyTblTblScan, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblScansVars))), resetPaging = FALSE)
+    replaceData(proxyTblBinlogCache, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblBinlogVars))), resetPaging = FALSE)
+    replaceData(proxyTblAbortCon, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% abortedCons))), resetPaging = FALSE)
+    replaceData(proxyTblUsedConn, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars))), resetPaging = FALSE)
+  })
+
+  # DT:renderDataTables (no replaceData)
   output$tblExecFreq <- DT::renderDataTable({
     datatable(statementAnalysis(), options = list(pageLength = 50)) %>%
       formatCurrency(columns = 'exec_count', currency = "", interval = 3, mark = " ", digits = 0) %>%
@@ -436,7 +466,7 @@ shinyServer(function(input, output, session) {
   output$dygraphProcess <- renderDygraph({
     dygraph(values$numUsers) %>%
       dyAxis("x", drawGrid = FALSE) %>%
-      dyAxis("y", label = "Number", valueRange = c(0, serverVal(innoDBstat(), "max_connections"))) %>%
+      dyAxis("y", label = "Number", valueRange = c(0, serverVal(cleanVarList(innoDBstat()), "max_connections"))) %>%
       dyAxis("y2", label = "Megabyte", independentTicks = TRUE) %>%
       dySeries("TOT_CONNECTIONS", fillGraph = TRUE, color = "#3F51B5") %>%
       dySeries("RUN_CONNECTIONS", fillGraph = TRUE, color = "#2196F3") %>%
@@ -486,37 +516,37 @@ shinyServer(function(input, output, session) {
   # PieCharts
   output$plotBufferFree <- ifelse(qryFlagTokuEngine(),
                                   renderGvis({
-                                    gvisBarChart(bufferDat(innoDBstat()), xvar = "engine", yvar = c("Filled", "Free"),
+                                    gvisBarChart(bufferDat(cleanVarList(innoDBstat())), xvar = "engine", yvar = c("Filled", "Free"),
                                                  options = list(hAxis = "{format:'#,###%'}", isStacked = TRUE,
                                                                 colors = "['#4CAF50','#FF9800']"))
                                   })
                                   ,
                                   renderGvis({
                                     appPieChart(label = c("Free", "Filled"),
-                                                value = c(serverValNum(innoDBstat(), "innodb_buffer_pool_pages_free"),
-                                                          serverValNum(innoDBstat(), "innodb_buffer_pool_pages_total") -
-                                                            serverValNum(innoDBstat(), "innodb_buffer_pool_pages_free"))
+                                                value = c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_free"),
+                                                          serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_total") -
+                                                            serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_free"))
                                     )
                                   })
   )
 
   output$plotBufferHitrate <- renderGvis({
     appPieChart(label = c("Reads", "Requests"),
-    value = c(serverValNum(innoDBstat(), "innodb_buffer_pool_reads"), serverValNum(innoDBstat(), "innodb_buffer_pool_read_requests"))
+    value = c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_reads"), serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_read_requests"))
     )
   })
 
   output$plotTableCacheHitrate <- renderGvis({
     appPieChart(label = c("Closed", "Open"),
-    value = c(serverValNum(innoDBstat(), "opened_tables") -
-                serverValNum(innoDBstat(), "open_tables"), serverValNum(innoDBstat(), "open_tables"))
+    value = c(serverValNum(cleanVarList(innoDBstat()), "opened_tables") -
+                serverValNum(cleanVarList(innoDBstat()), "open_tables"), serverValNum(cleanVarList(innoDBstat()), "open_tables"))
     )
   })
 
   output$plotTempTables <- renderGvis({
     appPieChart(label = c("On disk", "In memory"),
-    value = c(serverValNum(innoDBstat(), "created_tmp_disk_tables"),
-              serverValNum(innoDBstat(), "created_tmp_tables")), badColor = "#F44336"
+    value = c(serverValNum(cleanVarList(innoDBstat()), "created_tmp_disk_tables"),
+              serverValNum(cleanVarList(innoDBstat()), "created_tmp_tables")), badColor = "#F44336"
     )
   })
 
@@ -524,17 +554,17 @@ shinyServer(function(input, output, session) {
   # create dynmaic notification messages ---------------------------------
   # for sidebar
   output$menuNote <- renderUI({
-    messageData <- data.frame(text = c(paste0("Up-Time: ", serverVal(innoDBstat(), "KPI_UpTime")),
+    messageData <- data.frame(text = c(paste0("Up-Time: ", serverVal(cleanVarList(innoDBstat()), "KPI_UpTime")),
                                        paste0("No. Users: ", length(unique(mySQLprocessList()$USER))),
                                        paste0("No. Processes: ", length(mySQLprocessList()$USER)),
-                                       paste0("Open Tables: ", serverVal(innoDBstat(), "open_tables")),
+                                       paste0("Open Tables: ", serverVal(cleanVarList(innoDBstat()), "open_tables")),
                                        paste0("Buffer: ",
                                               ifelse(qryFlagTokuEngine(),
-                                                     formatIECBytes(bufferTotDat(innoDBstat())),
-                                                     serverVal(innoDBstat(), "innodb_buffer_pool_bytes_data")
+                                                     formatIECBytes(bufferTotDat(cleanVarList(innoDBstat()))),
+                                                     serverVal(cleanVarList(innoDBstat()), "innodb_buffer_pool_bytes_data")
                                                      )
                                               ),
-                                       paste0("Mem Used: ", serverVal(innoDBstat(), "memory_used"))
+                                       paste0("Mem Used: ", serverVal(cleanVarList(innoDBstat()), "memory_used"))
                            ),
                icon = c("clock-o", "user", "terminal", "table", "pie-chart", "pie-chart"),
                link = c("#shiny-tab-dashboard", "#shiny-tab-userStatTab", "#shiny-tab-dashboard",
@@ -551,10 +581,10 @@ shinyServer(function(input, output, session) {
   output$dropdownMenuNote <- renderUI({
 
     tmpTotServerRamGB <- configVal("TotServerRamKb") / 1024 / 1024 / 1024
-    messageData <- data.frame(text = c(paste0("Mem allocated global: ", serverVal(innoDBstat(), "globalMemAllocated")),
-                                       paste0("Mem allocated per thread: ", serverVal(innoDBstat(), "perThreadMemAllocated")),
-                                       paste0("Mem allocated per thread (max): ", serverVal(innoDBstat(), "ThreadMemAllocated")),
-                                       paste0("Overallocated memory: ", serverVal(innoDBstat(), "memOverallovated")),
+    messageData <- data.frame(text = c(paste0("Mem allocated global: ", serverVal(cleanVarList(innoDBstat()), "globalMemAllocated")),
+                                       paste0("Mem allocated per thread: ", serverVal(cleanVarList(innoDBstat()), "perThreadMemAllocated")),
+                                       paste0("Mem allocated per thread (max): ", serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated")),
+                                       paste0("Overallocated memory: ", serverVal(cleanVarList(innoDBstat()), "memOverallovated")),
                                        paste0("", nrow(indexData()), " unused indexes since last restart"),
                                        paste0(nrow(statementAnalysis()[as.numeric(gsub(" sec", "",
                                                                                        statementAnalysis()$avg_latency)) > 1, ]),
@@ -563,10 +593,10 @@ shinyServer(function(input, output, session) {
                                          statement95PercentileData()$exec_count) > 3, ]),
                                               " slow queries exec. more then three times")
     ),
-    value   = c(serverVal(innoDBstat(), "globalMemAllocated"),
-                serverVal(innoDBstat(), "perThreadMemAllocated"),
-                serverVal(innoDBstat(), "ThreadMemAllocated"),
-                serverVal(innoDBstat(), "memOverallovated"),
+    value   = c(serverVal(cleanVarList(innoDBstat()), "globalMemAllocated"),
+                serverVal(cleanVarList(innoDBstat()), "perThreadMemAllocated"),
+                serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated"),
+                serverVal(cleanVarList(innoDBstat()), "memOverallovated"),
                 nrow(indexData()),
                 nrow(statementAnalysis()[as.numeric(gsub(" sec", "", statementAnalysis()$avg_latency)) > 1, ]),
                 nrow(statement95PercentileData()[as.numeric(statement95PercentileData()$exec_count) > 3, ])),

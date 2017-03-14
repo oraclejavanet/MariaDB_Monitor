@@ -348,6 +348,30 @@ cleanProcList <- function(procList) {
 
 }
 
+#' clean global vars for buffer pool reads
+#'
+#' ...
+#'
+#' @export
+bufferReads <- function(serverVars) {
 
+  serverVars %>%
+    filter(VARIABLE_NAME %in% c('innodb_buffer_pool_reads', 'innodb_buffer_pool_read_requests',
+                   'innodb_buffer_pool_write_requests')) %>%
+    mutate(VARIABLE_VALUE_SEC = NA)
+
+}
+
+#' clean server variables
+#'
+#' ...
+#'
+#' @export
+cleanVarList <- function(varList) {
+
+  varList %>%
+    select(-DATETIME)
+
+}
 
 
