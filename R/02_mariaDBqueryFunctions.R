@@ -563,11 +563,11 @@ qryFlagTokuEngine <- function() {
 #' Function to query maxinfo
 #'
 #' @export
-qryMaxInfo <- function(what) {
+qryMaxInfo <- function(procList, what) {
 
-  if (is.null(procMaxscale(mySQLprocessList()))) return(NULL)
+  if (is.null(procMaxscale(procList))) return(NULL)
 
-  queryDB("show " %p0% what, "host=" %p0% procMaxscale(mySQLprocessList())$HOST, "port=" %p0% procMaxscale(mySQLprocessList())$PORT)
+  queryDB("show " %p0% what, "host=" %p0% procMaxscale(procList)$HOST, "port=" %p0% procMaxscale(procList)$PORT)
 
 }
 

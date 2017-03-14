@@ -404,7 +404,7 @@ shinyServer(function(input, output, session) {
       whatLocal <- what
 
       output[[outName]] <- DT::renderDataTable({
-        datatable(qryMaxInfo(whatLocal), options = list(pageLength = 50))
+        datatable(qryMaxInfo(mySQLprocessList(), whatLocal), options = list(pageLength = 50))
       })
 
     })
