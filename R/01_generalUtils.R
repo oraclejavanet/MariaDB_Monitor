@@ -260,7 +260,11 @@ asNum <- function(x) {
   tryCatch(suppressWarnings(as.numeric(x)), error = function(e) NA)
 }
 
-# mutate process data
+#' mutate process data
+#'
+#' ...
+#'
+#' @export
 procToTimeLine <- function(timeData) {
 
   # datahandling for calculating tot_connections, tot_memory and run_connections
@@ -298,7 +302,11 @@ procToTimeLine <- function(timeData) {
 
 }
 
-# does slave server exist
+#' get flag slave server exist from process data
+#'
+#' ...
+#'
+#' @export
 procSlaveServer <- function(procList) {
 
   if (length(grep("Binlog Dump", procList$COMMAND)) == 0) return(NULL)
@@ -309,7 +317,11 @@ procSlaveServer <- function(procList) {
 
 }
 
-# does maxscale exist
+#' get flag maxscale exist from process data
+#'
+#' ...
+#'
+#' @export
 procMaxscale <- function(procList) {
 
   if (length(grep("maxscale", procList$USER)) == 0) return(NULL)
@@ -318,6 +330,21 @@ procMaxscale <- function(procList) {
     filter(grepl("maxscale", USER)) %>%
     mutate(HOST = strsplit(HOST, ":")[[1]][1],
            PORT = 9003)
+
+}
+
+#' clean process data
+#'
+#' ...
+#'
+#' @export
+cleanProcList <- function(procList) {
+
+  procList %>%
+    mutate(MEMORY_USED = formatIECBytes(MEMORY_USED),
+           TIME = as.character(seconds_to_period(TIME)),
+           ID = as.character(ID)) %>%
+    select(-DATETIME)
 
 }
 

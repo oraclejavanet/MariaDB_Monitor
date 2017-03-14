@@ -5,14 +5,9 @@
 #' @export
 qryServStatData <- function() {
   # Load Status Variables
-  innoDBstat <- queryDB("Select * from information_schema.GLOBAL_STATUS;")
-
-  # Load Global Variables
-  mySQLvars <- queryDB("SHOW GLOBAL VARIABLES;") %>%
-    rename(VARIABLE_NAME = Variable_name, VARIABLE_VALUE = Value)
-
-  # Combine Status and Global Variables-Dataset
-  innoDBstat <- rbind(innoDBstat, mySQLvars) %>%
+  innoDBstat <- queryDB("Select * from information_schema.GLOBAL_STATUS
+                         UNION ALL
+                         Select * from information_schema.GLOBAL_VARIABLES;") %>%
     mutate(VARIABLE_NAME = tolower(VARIABLE_NAME))
 
   # Insert new Variables in Dataset
@@ -140,23 +135,7 @@ qryProcData <- function() {
                               `EXAMINED_ROWS`, substr(`INFO`, 1, 120) as INFO, CURRENT_TIME() as DATETIME
                               FROM `information_schema`.`PROCESSLIST`;")
 
-  # timleline-view
-  timeline <- procToTimeLine(mySQLprocessList)
-
-  # proclist
-  proclist <- mySQLprocessList %>%
-    mutate(MEMORY_USED = formatIECBytes(MEMORY_USED),
-           TIME = as.character(seconds_to_period(TIME)),
-           ID = as.character(ID)) %>%
-    select(-DATETIME)
-
-  # slave check
-  slaveServer <- procSlaveServer(mySQLprocessList)
-
-  # maxscale check
-  maxscale <- procMaxscale(mySQLprocessList)
-
-  list(timeline = timeline, proclist = proclist, slaveServer = slaveServer, maxscale = maxscale)
+  return(mySQLprocessList)
 
 }
 
@@ -168,7 +147,7 @@ qryProcData <- function() {
 #' @export
 qryStmtAnalysis <- function() {
 
-  statementAnalysisData     <- queryDB("
+  statementAnalysisData <- queryDB("
         SELECT
           `COUNT_STAR` as exec_count
           , `AVG_TIMER_WAIT` AS `avg_latency`
@@ -586,9 +565,9 @@ qryFlagTokuEngine <- function() {
 #' @export
 qryMaxInfo <- function(what) {
 
-  if (is.null(qryProcData()$maxscale)) return(NULL)
+  if (is.null(procMaxscale(mySQLprocessList()))) return(NULL)
 
-  queryDB("show " %p0% what, "host=" %p0% qryProcData()$maxscale$HOST, "port=" %p0% qryProcData()$maxscale$PORT)
+  queryDB("show " %p0% what, "host=" %p0% procMaxscale(mySQLprocessList())$HOST, "port=" %p0% procMaxscale(mySQLprocessList())$PORT)
 
 }
 
