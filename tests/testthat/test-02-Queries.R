@@ -26,7 +26,7 @@ test_that("qryIdxData", {
 test_that("qryTimeLine", {
   checkConnection()
   appDbTz <<- "GMT"
-  dat <- qryProcData()$timeline
+  dat <- procToTimeLine(qryProcData())
   colNames <- c("TOT_CONNECTIONS", "TOT_MEMORY", "RUN_CONNECTIONS")
   expect_equal(names(dat), colNames)
   expect_is(dat, "xts")
@@ -122,7 +122,7 @@ test_that("qryServStatData", {
                              "query_cache_min_res_unit", "sort_merge_passes", "sort_range", "sort_scan",
                              "com_select", "table_locks_immediate", "table_locks_waited", "binlog_cache_use",
                              "binlog_cache_disk_use", "binlog_stmt_cache_disk_use", "binlog_stmt_cache_use")
-  dat <- qryServStatData()
+  dat <- cleanVarList(qryServStatData())
   colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE")
   expect_equal(names(dat), colNames)
   expect_is(dat, "data.frame")
@@ -140,7 +140,7 @@ test_that("qryTmpDiscTblStmt", {
 
 test_that("qryProcData", {
   checkConnection()
-  dat <- qryProcData()$proclist
+  dat <- cleanProcList(qryProcData())
   colNames <- c("ID", "USER", "HOST", "DB", "COMMAND",
                 "TIME", "PROGRESS", "STATE", "MEMORY_USED",
                 "EXAMINED_ROWS", "INFO")
@@ -160,7 +160,7 @@ test_that("qryUserStat", {
 
 test_that("qryBufferReads", {
   checkConnection()
-  dat <- qryBufferReads()
+  dat <- bufferReads(qryServStatData())
   colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE", "DATETIME", "VARIABLE_VALUE_SEC")
   expect_equal(names(dat), colNames)
   expect_is(dat, "data.frame")

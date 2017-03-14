@@ -97,9 +97,10 @@ shinyServer(function(input, output, session) {
        paste0("InnoDB Buffer Pool (", formatIECBytes(serverValNum(cleanVarList(innoDBstat()), "KPI_bufPoolSize")), ")")
   ))
 
-  output$maxCon     <- renderText(paste0("Maximum number of connections: ", serverVal(cleanVarList(innoDBstat()), "max_connections"), " (multiplied
-                                    with following values leading to maximum use of ", serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated"),
-                                    " total thread memory and ", serverVal(cleanVarList(innoDBstat()), "memOverallovated"), " overallocated memory)"))
+  output$maxCon     <- renderText(paste0("Maximum number of connections: ", serverVal(cleanVarList(innoDBstat()),
+                          "max_connections"), " (multiplied with following values leading to maximum use of ",
+                          serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated"), " total thread memory and ",
+                          serverVal(cleanVarList(innoDBstat()), "memOverallovated"), " overallocated memory)"))
   # html manipulations ---------------------------------
   output$innoDBStatus <- renderUI({
 
@@ -220,7 +221,8 @@ shinyServer(function(input, output, session) {
       formatCurrency(columns = 'VARIABLE_VALUE', currency = "", interval = 3, mark = " ", digits = 0) %>%
       formatStyle(
         'VARIABLE_VALUE',
-        background = styleColorBar(as.numeric(isolate(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars)$VARIABLE_VALUE)), 'steelblue'),
+        background = styleColorBar(as.numeric(isolate(dplyr::filter(cleanVarList(innoDBstat()),
+                      VARIABLE_NAME %in% usedConVars)$VARIABLE_VALUE)), 'steelblue'),
         backgroundSize = '100% 90%',
         backgroundRepeat = 'no-repeat',
         backgroundPosition = 'center'
@@ -243,18 +245,30 @@ shinyServer(function(input, output, session) {
 
   # observe for data tables
   observe({
-    replaceData(proxyTblTmpTables, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tmpTableStatVars))), resetPaging = FALSE)
-    replaceData(proxyTblTblLock, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblLockingVars))), resetPaging = FALSE)
-    replaceData(proxyTblSlowQry, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% slowQryVars))), resetPaging = FALSE)
-    replaceData(proxyTblWorkThread, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% workerThreadsVars))), resetPaging = FALSE)
-    replaceData(proxyTblKeyBuffSize, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% keyBufferSizeVars))), resetPaging = FALSE)
-    replaceData(proxyTblQryCache, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% qryCacheVars))), resetPaging = FALSE)
-    replaceData(proxyTblSortOp, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% sortOpVars))), resetPaging = FALSE)
-    replaceData(proxyTblJoins, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% joinVars))), resetPaging = FALSE)
-    replaceData(proxyTblTblScan, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblScansVars))), resetPaging = FALSE)
-    replaceData(proxyTblBinlogCache, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblBinlogVars))), resetPaging = FALSE)
-    replaceData(proxyTblAbortCon, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% abortedCons))), resetPaging = FALSE)
-    replaceData(proxyTblUsedConn, isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars))), resetPaging = FALSE)
+    replaceData(proxyTblTmpTables,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tmpTableStatVars))), resetPaging = FALSE)
+    replaceData(proxyTblTblLock,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblLockingVars))), resetPaging = FALSE)
+    replaceData(proxyTblSlowQry,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% slowQryVars))), resetPaging = FALSE)
+    replaceData(proxyTblWorkThread,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% workerThreadsVars))), resetPaging = FALSE)
+    replaceData(proxyTblKeyBuffSize,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% keyBufferSizeVars))), resetPaging = FALSE)
+    replaceData(proxyTblQryCache,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% qryCacheVars))), resetPaging = FALSE)
+    replaceData(proxyTblSortOp,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% sortOpVars))), resetPaging = FALSE)
+    replaceData(proxyTblJoins,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% joinVars))), resetPaging = FALSE)
+    replaceData(proxyTblTblScan,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblScansVars))), resetPaging = FALSE)
+    replaceData(proxyTblBinlogCache,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblBinlogVars))), resetPaging = FALSE)
+    replaceData(proxyTblAbortCon,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% abortedCons))), resetPaging = FALSE)
+    replaceData(proxyTblUsedConn,
+      isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars))), resetPaging = FALSE)
   })
 
   # DT:renderDataTables (no replaceData)
@@ -516,37 +530,40 @@ shinyServer(function(input, output, session) {
   # PieCharts
   output$plotBufferFree <- ifelse(qryFlagTokuEngine(),
                                   renderGvis({
-                                    gvisBarChart(bufferDat(cleanVarList(innoDBstat())), xvar = "engine", yvar = c("Filled", "Free"),
+                                    gvisBarChart(isolate(bufferDat(cleanVarList(innoDBstat()))), xvar = "engine",
+                                                 yvar = c("Filled", "Free"),
                                                  options = list(hAxis = "{format:'#,###%'}", isStacked = TRUE,
                                                                 colors = "['#4CAF50','#FF9800']"))
                                   })
                                   ,
                                   renderGvis({
                                     appPieChart(label = c("Free", "Filled"),
-                                                value = c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_free"),
-                                                          serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_total") -
-                                                            serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_pages_free"))
+                                                value = isolate(
+                                                  c(serverValNum(cleanVarList(innoDBstat())), "innodb_buffer_pool_pages_free",
+                                                    serverValNum(cleanVarList(innoDBstat())), "innodb_buffer_pool_pages_total" -
+                                                    serverValNum(cleanVarList(innoDBstat()))), "innodb_buffer_pool_pages_free")
                                     )
                                   })
   )
 
   output$plotBufferHitrate <- renderGvis({
     appPieChart(label = c("Reads", "Requests"),
-    value = c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_reads"), serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_read_requests"))
+    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_reads"),
+                      serverValNum(cleanVarList(innoDBstat()), "innodb_buffer_pool_read_requests")))
     )
   })
 
   output$plotTableCacheHitrate <- renderGvis({
     appPieChart(label = c("Closed", "Open"),
-    value = c(serverValNum(cleanVarList(innoDBstat()), "opened_tables") -
-                serverValNum(cleanVarList(innoDBstat()), "open_tables"), serverValNum(cleanVarList(innoDBstat()), "open_tables"))
+    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "opened_tables") -
+                serverValNum(cleanVarList(innoDBstat()), "open_tables"), serverValNum(cleanVarList(innoDBstat()), "open_tables")))
     )
   })
 
   output$plotTempTables <- renderGvis({
     appPieChart(label = c("On disk", "In memory"),
-    value = c(serverValNum(cleanVarList(innoDBstat()), "created_tmp_disk_tables"),
-              serverValNum(cleanVarList(innoDBstat()), "created_tmp_tables")), badColor = "#F44336"
+    value = isolate(c(serverValNum(cleanVarList(innoDBstat()), "created_tmp_disk_tables"),
+              serverValNum(cleanVarList(innoDBstat()), "created_tmp_tables"))), badColor = "#F44336"
     )
   })
 
@@ -582,8 +599,10 @@ shinyServer(function(input, output, session) {
 
     tmpTotServerRamGB <- configVal("TotServerRamKb") / 1024 / 1024 / 1024
     messageData <- data.frame(text = c(paste0("Mem allocated global: ", serverVal(cleanVarList(innoDBstat()), "globalMemAllocated")),
-                                       paste0("Mem allocated per thread: ", serverVal(cleanVarList(innoDBstat()), "perThreadMemAllocated")),
-                                       paste0("Mem allocated per thread (max): ", serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated")),
+                                       paste0("Mem allocated per thread: ",
+                                              serverVal(cleanVarList(innoDBstat()), "perThreadMemAllocated")),
+                                       paste0("Mem allocated per thread (max): ",
+                                              serverVal(cleanVarList(innoDBstat()), "ThreadMemAllocated")),
                                        paste0("Overallocated memory: ", serverVal(cleanVarList(innoDBstat()), "memOverallovated")),
                                        paste0("", nrow(indexData()), " unused indexes since last restart"),
                                        paste0(nrow(statementAnalysis()[as.numeric(gsub(" sec", "",
