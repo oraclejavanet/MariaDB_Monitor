@@ -49,3 +49,5 @@ Further information and explanations can be found in our blog article:
 
 - [English-Version](https://www.inwt-statistics.com/read-blog/mariadb-monitor.html)
 - [Deutsche-Version](https://www.inwt-statistics.de/blog-artikel-lesen/mariadb_monitor.html)
+
+The App is tested on MariaDB-Server 10.1 with Performance Schema Version 5.6.35.
