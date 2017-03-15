@@ -160,60 +160,29 @@ shinyServer(function(input, output, session) {
   })
 
   # DT:renderDataTables
-  output$tblTmpTables <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tmpTableStatVars)))
-    )
-  })
 
-  output$tblTblLock <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblLockingVars)))
-    )
-  })
+  # automated code-creation for basic tables
+  grpVars <- list(tblTmpTables = tmpTableStatVars, tblTblLock = tblLockingVars, tblSlowQry = slowQryVars,
+                  tblWorkThread = workerThreadsVars, tblKeyBuffSize = keyBufferSizeVars, tblQryCache = qryCacheVars,
+                  tblSortOp = sortOpVars, tblJoins = joinVars, tblTblScan = tblScansVars, tblBinlogCache = tblBinlogVars,
+                  tblAbortCon = abortedCons)
+  # proxy for data tables
+  for (i in 1:length(grpVars)) {
 
-  output$tblSlowQry <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% slowQryVars)))
-    )
-  })
+    outName <- names(grpVars)[i]
 
-  output$tblWorkThread <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% workerThreadsVars)))
-    )
-  })
+    local({
 
-  output$tblKeyBuffSize <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% keyBufferSizeVars)))
-    )
-  })
+      grpVarLocal <- grpVars[[i]]
 
-  output$tblQryCache <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% qryCacheVars)))
-    )
-  })
+      output[[outName]] <- DT::renderDataTable({
+        appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% grpVarLocal)))
+        )
+      })
 
-  output$tblSortOp <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% sortOpVars)))
-    )
-  })
+    })
 
-  output$tblJoins <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% joinVars)))
-    )
-  })
-
-  output$tblTblScan <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblScansVars)))
-    )
-  })
-
-  output$tblBinlogCache <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% tblBinlogVars)))
-    )
-  })
-
-  output$tblAbortCon <- DT::renderDataTable({
-    appDataTable(isolate(transformThousends(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% abortedCons)))
-    )
-  })
+  }
 
   output$tblUsedCon <- DT::renderDataTable({
     datatable(isolate(dplyr::filter(cleanVarList(innoDBstat()), VARIABLE_NAME %in% usedConVars)),
