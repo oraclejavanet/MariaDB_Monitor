@@ -33,14 +33,6 @@ test_that("qryTimeLine", {
   expect_is(dat, "zoo")
 })
 
-test_that("qryLogWrites", {
-  checkConnection()
-  dat <- cleanLogWrites(qryServStatData())
-  colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE", "DATETIME", "VARIABLE_VALUE_SEC")
-  expect_equal(names(dat), colNames)
-  expect_is(dat, "data.frame")
-})
-
 test_that("qryIdxNullable", {
   checkConnection()
   dat <- qryIdxNullable()
@@ -124,6 +116,14 @@ test_that("qryServStatData", {
                              "binlog_cache_disk_use", "binlog_stmt_cache_disk_use", "binlog_stmt_cache_use")
   dat <- cleanVarList(qryServStatData())
   colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE")
+  expect_equal(names(dat), colNames)
+  expect_is(dat, "data.frame")
+})
+
+test_that("qryLogWrites", {
+  checkConnection()
+  dat <- cleanLogWrites(qryServStatData())
+  colNames <- c("VARIABLE_NAME", "VARIABLE_VALUE", "DATETIME", "VARIABLE_VALUE_SEC")
   expect_equal(names(dat), colNames)
   expect_is(dat, "data.frame")
 })
